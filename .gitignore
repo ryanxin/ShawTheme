@@ -1,0 +1,65 @@
+# WordPress Core
+/wp-admin/
+/wp-includes/
+/wp-*.php
+/index.php
+/license.txt
+/readme.html
+/xmlrpc.php
+
+# WordPress Config
+wp-config.php
+wp-config-local.php
+local-xdebuginfo.php
+
+# htaccess
+/.htaccess
+
+# Uploads & Cache
+wp-content/uploads/
+wp-content/cache/
+wp-content/backups/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# Track custom plugins and themes
+# Add specific third-party plugins/themes to ignore if needed
+# Example:
+# wp-content/plugins/akismet/
+# wp-content/themes/twentytwentyfour/
+
+# Common Plugin/Theme Generated Files
+wp-content/object-cache.php
+*.log
+
+# System & Editor Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Local by Flywheel
+local-xdebuginfo.php
+
+# Composer & Node
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.*
+!.env.example
