@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shawglobal/project-card",
+	"version": "1.0.0",
+	"title": "Immigration Project Card",
+	"category": "widgets",
+	"icon": "location-alt",
+	"description": "Display an immigration project card with key information",
+	"keywords": ["immigration", "project", "card"],
+	"textdomain": "shawglobal-theme",
+	"attributes": {
+		"projectId": {
+			"type": "number",
+			"default": 0
+		},
+		"showExcerpt": {
+			"type": "boolean",
+			"default": true
+		},
+		"showMeta": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"],
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
+}

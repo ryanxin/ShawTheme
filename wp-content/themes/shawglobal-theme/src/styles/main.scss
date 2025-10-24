@@ -1,0 +1,119 @@
+/**
+ * Main stylesheet for Shaw Global Immigration Theme
+ */
+
+// Import WordPress default styles
+@import "~@wordpress/base-styles/colors";
+@import "~@wordpress/base-styles/variables";
+@import "~@wordpress/base-styles/mixins";
+@import "~@wordpress/base-styles/breakpoints";
+
+// Global styles
+body {
+	font-family: var(--wp--preset--font-family--fira-sans);
+	color: var(--wp--preset--color--text-primary);
+	line-height: 1.6;
+}
+
+// Immigration Project specific styles
+.immigration-project {
+	&-card {
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		background: var(--wp--preset--color--white);
+		box-shadow: 0 2px 12px rgba(26, 20, 72, 0.08);
+
+		&:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 8px 24px rgba(26, 20, 72, 0.12);
+		}
+	}
+
+	&-info-cards {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1.5rem;
+		margin: 2rem 0;
+
+		.info-card {
+			padding: 1.5rem;
+			background: var(--wp--preset--color--soft-gray);
+			border-radius: 12px;
+			text-align: center;
+			border: 1px solid var(--wp--preset--color--light-blue-gray);
+			transition: all 0.3s ease;
+
+			&:hover {
+				background: var(--wp--preset--color--white);
+				border-color: var(--wp--preset--color--accent-orange);
+			}
+
+			.info-label {
+				font-size: 0.875rem;
+				color: var(--wp--preset--color--text-secondary);
+				margin-bottom: 0.5rem;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.info-value {
+				font-size: 1.125rem;
+				font-weight: 600;
+				color: var(--wp--preset--color--primary-dark);
+			}
+		}
+	}
+}
+
+// Filter styles
+.immigration-filter {
+	padding: 2rem;
+	background: var(--wp--preset--color--soft-gray);
+	border-radius: 12px;
+	margin-bottom: 2rem;
+	border: 1px solid var(--wp--preset--color--light-blue-gray);
+
+	.filter-controls {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1rem;
+
+		select {
+			padding: 0.75rem 1rem;
+			border: 1px solid var(--wp--preset--color--light-blue-gray);
+			border-radius: 8px;
+			font-size: 1rem;
+			min-width: 200px;
+			background: var(--wp--preset--color--white);
+			color: var(--wp--preset--color--text-primary);
+			transition: all 0.2s ease;
+
+			&:focus {
+				outline: none;
+				border-color: var(--wp--preset--color--accent-orange);
+				box-shadow: 0 0 0 3px rgba(225, 154, 88, 0.1);
+			}
+
+			&:hover {
+				border-color: var(--wp--preset--color--primary-dark);
+			}
+		}
+	}
+}
+
+// Responsive utilities
+@media (max-width: 782px) {
+	.immigration-project-info-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.immigration-filter .filter-controls {
+		flex-direction: column;
+
+		select {
+			width: 100%;
+		}
+	}
+}

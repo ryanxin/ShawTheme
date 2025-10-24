@@ -1,0 +1,49 @@
+/*
+Theme Name: Shaw Global Immigration Theme
+Theme URI: https://shawglobal.com
+Description: A modern FSE block theme for Shaw Global immigration website
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.4
+Requires PHP: 7.4
+Author: Shaw Global
+Author URI: https://shawglobal.com
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: shawglobal-theme
+Domain Path: /languages
+Tags: immigration, business, full-site-editing, block-theme, responsive-layout, dark-mode
+
+This theme is free software distributed under the terms of the GNU GPL.
+*/
+
+:root {
+  /* Theme Colors - Shaw Global Immigration */
+  --neutral-01100: rgba(255, 255, 255, 1);
+  --neutral-015: rgba(255, 255, 255, 0.1);
+  --primary-purple: rgba(26, 20, 72, 1);
+  --accent-orange: rgba(225, 154, 88, 1);
+  --light-blue-gray: rgba(202, 209, 233, 1);
+  --white-translucent: rgba(255, 255, 255, 0.85);
+  --soft-gray: rgba(245, 245, 247, 1);
+  --soft-gray-2: rgba(244, 246, 247, 1);
+  --text-secondary: rgba(140, 140, 140, 1);
+  --text-primary: rgba(64, 64, 64, 1);
+
+  /* WordPress Admin Colors */
+  --wp-admin-theme-color: #1a1448;
+  --wp-admin-theme-color-darker-10: #150f3a;
+  --wp-admin-theme-color-darker-20: #100a2c;
+}
+
+/* Light Mode */
+[data-colors-mode="light"] {
+  --colors-labels-vibrant-controls-secondary: rgba(140, 140, 140, 1);
+  --colors-labels-vibrant-controls-primary: rgba(64, 64, 64, 1);
+}
+
+/* Dark Mode */
+[data-colors-mode="dark"] {
+  --colors-labels-vibrant-controls-secondary: rgba(115, 115, 115, 1);
+  --colors-labels-vibrant-controls-primary: rgba(191, 191, 191, 1);
+}

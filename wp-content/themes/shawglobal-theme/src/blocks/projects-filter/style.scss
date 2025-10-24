@@ -1,0 +1,96 @@
+/**
+ * Projects Filter Block Styles (Frontend & Editor)
+ */
+
+.immigration-filter {
+	padding: 2.5rem;
+	background: var(--wp--preset--color--soft-gray);
+	border-radius: 12px;
+	border: 1px solid var(--wp--preset--color--light-blue-gray);
+
+	.filter-controls {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 2rem;
+
+		select {
+			flex: 1;
+			min-width: 220px;
+			padding: 0.875rem 1.25rem;
+			border: 1px solid var(--wp--preset--color--light-blue-gray);
+			border-radius: 8px;
+			font-size: 1rem;
+			background: var(--wp--preset--color--white);
+			color: var(--wp--preset--color--text-primary);
+			cursor: pointer;
+			transition: all 0.2s ease;
+			box-shadow: 0 1px 3px rgba(26, 20, 72, 0.05);
+
+			&:focus {
+				outline: none;
+				border-color: var(--wp--preset--color--accent-orange);
+				box-shadow: 0 0 0 3px rgba(225, 154, 88, 0.1);
+			}
+
+			&:hover {
+				border-color: var(--wp--preset--color--primary-dark);
+			}
+		}
+	}
+
+	.projects-grid {
+		display: grid;
+		gap: 2rem;
+		grid-template-columns: repeat(3, 1fr);
+
+		@media (max-width: 1024px) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@media (max-width: 600px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.project-card {
+		padding: 2rem;
+		background: var(--wp--preset--color--white);
+		border-radius: 12px;
+		border: 1px solid var(--wp--preset--color--light-blue-gray);
+		box-shadow: 0 2px 12px rgba(26, 20, 72, 0.08);
+		transition: all 0.3s ease;
+
+		&:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 8px 24px rgba(26, 20, 72, 0.12);
+			border-color: var(--wp--preset--color--accent-orange);
+		}
+
+		h3 {
+			margin: 0 0 1rem;
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: var(--wp--preset--color--primary-dark);
+			line-height: 1.3;
+		}
+
+		.project-excerpt {
+			color: var(--wp--preset--color--text-primary);
+			line-height: 1.6;
+
+			p {
+				margin: 0;
+			}
+		}
+	}
+
+	.loading-message,
+	.no-results {
+		grid-column: 1 / -1;
+		text-align: center;
+		padding: 4rem 2rem;
+		color: var(--wp--preset--color--text-secondary);
+		font-size: 1.125rem;
+	}
+}

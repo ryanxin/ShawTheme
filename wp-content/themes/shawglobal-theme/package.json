@@ -1,0 +1,32 @@
+{
+  "name": "shawglobal-theme",
+  "version": "1.0.0",
+  "description": "Shaw Global Immigration Theme - Modern FSE block theme with React blocks",
+  "main": "functions.php",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style",
+    "format:js": "wp-scripts format-js",
+    "test:unit": "wp-scripts test-unit-js",
+    "test:e2e": "wp-scripts test-e2e"
+  },
+  "keywords": [
+    "wordpress",
+    "theme",
+    "block-theme",
+    "fse",
+    "immigration",
+    "react"
+  ],
+  "author": "Shaw Global",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/scripts": "^27.0.0",
+    "@wordpress/block-editor": "^12.0.0",
+    "@wordpress/components": "^25.0.0",
+    "@wordpress/api-fetch": "^6.0.0"
+  },
+  "dependencies": {}
+}

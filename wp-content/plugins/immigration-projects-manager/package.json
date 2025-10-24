@@ -1,0 +1,27 @@
+{
+  "name": "immigration-projects-manager",
+  "version": "1.0.0",
+  "description": "Immigration Projects Manager - Custom post type, taxonomies, ACF fields and REST API for immigration projects",
+  "main": "immigration-projects-manager.php",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "lint:js": "wp-scripts lint-js",
+    "lint:php": "composer run lint",
+    "test:e2e": "wp-scripts test-e2e",
+    "test:unit": "wp-scripts test-unit-js"
+  },
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "immigration",
+    "custom-post-type",
+    "acf"
+  ],
+  "author": "Shaw Global",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/scripts": "^27.0.0"
+  },
+  "dependencies": {}
+}
