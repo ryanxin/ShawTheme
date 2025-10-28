@@ -1,119 +1,392 @@
-/**
- * Main stylesheet for Shaw Global Immigration Theme
- */
+/* Shaw Global Immigration Theme - Main Styles */
 
-// Import WordPress default styles
-@import "~@wordpress/base-styles/colors";
-@import "~@wordpress/base-styles/variables";
-@import "~@wordpress/base-styles/mixins";
-@import "~@wordpress/base-styles/breakpoints";
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&family=Platypi:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
 
-// Global styles
+/* Base Styles */
 body {
-	font-family: var(--wp--preset--font-family--fira-sans);
-	color: var(--wp--preset--color--text-primary);
-	line-height: 1.6;
+  font-family: var(--wp--preset--font-family--fira-sans);
+  line-height: 1.6;
+  color: var(--wp--preset--color--text-gray);
+  padding-top: 80px; /* 为固定头部留出空间 */
 }
 
-// Immigration Project specific styles
-.immigration-project {
-	&-card {
-		border-radius: 12px;
-		overflow: hidden;
-		transition: transform 0.3s ease, box-shadow 0.3s ease;
-		background: var(--wp--preset--color--white);
-		box-shadow: 0 2px 12px rgba(26, 20, 72, 0.08);
-
-		&:hover {
-			transform: translateY(-4px);
-			box-shadow: 0 8px 24px rgba(26, 20, 72, 0.12);
-		}
-	}
-
-	&-info-cards {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 1.5rem;
-		margin: 2rem 0;
-
-		.info-card {
-			padding: 1.5rem;
-			background: var(--wp--preset--color--soft-gray);
-			border-radius: 12px;
-			text-align: center;
-			border: 1px solid var(--wp--preset--color--light-blue-gray);
-			transition: all 0.3s ease;
-
-			&:hover {
-				background: var(--wp--preset--color--white);
-				border-color: var(--wp--preset--color--accent-orange);
-			}
-
-			.info-label {
-				font-size: 0.875rem;
-				color: var(--wp--preset--color--text-secondary);
-				margin-bottom: 0.5rem;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-			}
-
-			.info-value {
-				font-size: 1.125rem;
-				font-weight: 600;
-				color: var(--wp--preset--color--primary-dark);
-			}
-		}
-	}
+/* 首页特殊处理 - 不需要上边距，因为封面会覆盖 */
+body.home {
+  padding-top: 0;
 }
 
-// Filter styles
-.immigration-filter {
-	padding: 2rem;
-	background: var(--wp--preset--color--soft-gray);
-	border-radius: 12px;
-	margin-bottom: 2rem;
-	border: 1px solid var(--wp--preset--color--light-blue-gray);
-
-	.filter-controls {
-		display: flex;
-		gap: 1rem;
-		flex-wrap: wrap;
-		margin-bottom: 1rem;
-
-		select {
-			padding: 0.75rem 1rem;
-			border: 1px solid var(--wp--preset--color--light-blue-gray);
-			border-radius: 8px;
-			font-size: 1rem;
-			min-width: 200px;
-			background: var(--wp--preset--color--white);
-			color: var(--wp--preset--color--text-primary);
-			transition: all 0.2s ease;
-
-			&:focus {
-				outline: none;
-				border-color: var(--wp--preset--color--accent-orange);
-				box-shadow: 0 0 0 3px rgba(225, 154, 88, 0.1);
-			}
-
-			&:hover {
-				border-color: var(--wp--preset--color--primary-dark);
-			}
-		}
-	}
+/* Header Styles */
+.transparent-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  
+  /* 首页效果 - 更透明 */
+  body.home & {
+    background-color: rgba(26,20,72,0.7) !important;
+  }
+  
+  /* 其他页面效果 - 稍微不透明 */
+  body:not(.home) & {
+    background-color: rgba(26,20,72,0.9) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  /* 滚动时的效果 */
+  &.scrolled {
+    background-color: rgba(26,20,72,0.95) !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    padding-top: var(--wp--preset--spacing--2);
+    padding-bottom: var(--wp--preset--spacing--2);
+  }
 }
 
-// Responsive utilities
-@media (max-width: 782px) {
-	.immigration-project-info-cards {
-		grid-template-columns: 1fr;
-	}
+/* Navigation Styles */
+.wp-block-navigation {
+  .wp-block-navigation__responsive-container-open {
+    color: white;
+  }
+  
+  .wp-block-navigation__responsive-container-close {
+    color: white;
+  }
+  
+  .wp-block-navigation-item__content {
+    color: white;
+    font-weight: 500;
+    
+    &:hover {
+      color: var(--wp--preset--color--accent-orange);
+    }
+  }
+}
 
-	.immigration-filter .filter-controls {
-		flex-direction: column;
+/* Cover Block Styles */
+.wp-block-cover {
+  .cover-content {
+    padding: 2rem;
+    text-align: center;
+  }
+}
 
-		select {
-			width: 100%;
-		}
-	}
+/* 首页英雄区域 */
+.home-hero {
+  position: relative;
+  z-index: 1;
+  
+  .cover-content {
+    padding-top: 120px; /* 为透明头部留出空间 */
+    padding-bottom: 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+/* Project Cards */
+.wp-block-post-template {
+  .wp-block-group {
+    border: 1px solid var(--wp--preset--color--medium-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+  }
+  
+  .wp-block-post-featured-image {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .wp-block-post-title {
+    margin-bottom: 0.5rem;
+    
+    a {
+      color: var(--wp--preset--color--primary-navy);
+      text-decoration: none;
+      
+      &:hover {
+        color: var(--wp--preset--color--accent-orange);
+      }
+    }
+  }
+}
+
+/* Button Styles */
+.wp-block-button {
+  .wp-block-button__link {
+    border-radius: 4px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+/* Footer Styles */
+.footer-main {
+  background-color: #1a1448 !important;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  
+  /* 确保三栏布局 */
+  .wp-block-columns {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    
+    .wp-block-column {
+      flex: 1;
+    }
+  }
+  
+  .footer-brand {
+    .wp-block-site-logo {
+      margin-bottom: 1rem;
+    }
+    
+    .wp-block-paragraph {
+      color: #ffffff;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+  }
+  
+  .footer-about {
+    .wp-block-heading {
+      color: #e19a58;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    
+    .wp-block-paragraph {
+      color: #ffffff;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+  }
+  
+  .footer-contact {
+    .wp-block-heading {
+      color: #e19a58;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    
+    .wp-block-paragraph {
+      color: #ffffff;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .wp-block-separator {
+    background-color: rgba(255,255,255,0.2) !important;
+    margin: 2rem 0;
+  }
+  
+  .scroll-to-top {
+    .wp-block-button__link {
+      background: transparent !important;
+      border: none;
+      color: #ffffff;
+      font-size: 18px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        color: #e19a58;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+/* Mobile Menu Styles */
+body.mobile-menu-open {
+  overflow: hidden;
+  
+  .wp-block-navigation__responsive-container {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26,20,72,0.98);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    padding: 2rem;
+    
+    .wp-block-navigation__responsive-container-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      
+      .wp-block-navigation-item {
+        margin: 1rem 0;
+        
+        .wp-block-navigation-item__content {
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .transparent-header {
+    padding-top: var(--wp--preset--spacing--2);
+    padding-bottom: var(--wp--preset--spacing--2);
+  }
+  
+  .wp-block-group.alignwide {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .wp-block-cover {
+    min-height: 400px !important;
+    
+    .cover-content {
+      padding: 1rem;
+    }
+  }
+  
+  .home-hero .cover-content {
+    padding-top: 100px;
+    padding-bottom: 1rem;
+  }
+  
+  .wp-block-post-template {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* 移动端导航按钮样式 */
+  .wp-block-navigation__responsive-container-open {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    
+    &:hover {
+      color: var(--wp--preset--color--accent-orange);
+    }
+  }
+  
+  /* Footer 移动端样式 */
+  .footer-main {
+    .wp-block-columns {
+      flex-direction: column;
+      gap: 1.5rem;
+      
+      .wp-block-column {
+        width: 100%;
+        flex: none;
+      }
+    }
+    
+    .footer-brand,
+    .footer-about,
+    .footer-contact {
+      text-align: center;
+    }
+    
+    .footer-contact {
+      .wp-block-heading {
+        font-size: 18px;
+      }
+      
+      .wp-block-paragraph {
+        font-size: 14px;
+      }
+    }
+    
+    .wp-block-separator {
+      margin: 1.5rem 0;
+    }
+    
+    .scroll-to-top {
+      margin-top: 1rem;
+      
+      .wp-block-button__link {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* Custom Immigration Project Styles */
+.project-info-cards {
+  background: var(--wp--preset--color--light-gray);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  
+  .wp-block-heading {
+    color: var(--wp--preset--color--primary-navy);
+    margin-bottom: 1.5rem;
+  }
+}
+
+.project-tabs {
+  margin-bottom: 2rem;
+  
+  .wp-block-heading {
+    color: var(--wp--preset--color--primary-navy);
+    margin-bottom: 1.5rem;
+  }
+}
+
+.project-sidebar {
+  background: var(--wp--preset--color--light-gray);
+  border-radius: 8px;
+  padding: 2rem;
+  
+  .wp-block-heading {
+    color: var(--wp--preset--color--primary-navy);
+    margin-bottom: 1.5rem;
+  }
+}
+
+.related-projects-section {
+  background: var(--wp--preset--color--light-gray);
+  padding: 3rem 0;
+  margin-top: 3rem;
+  
+  .wp-block-heading {
+    color: var(--wp--preset--color--primary-navy);
+    margin-bottom: 2rem;
+  }
 }
