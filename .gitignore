@@ -1,0 +1,70 @@
+# WordPress 项目通用 .gitignore（仅跟踪自定义 plugin 与 theme）
+# 使用方法：将下面的 your-plugin-slug 与 your-theme-slug 替换为你的实际目录名
+
+# 1) 根目录：默认忽略一切
+/*
+
+# 允许必要的目录/文件被重新包含
+!/.gitignore
+!/README.md
+!/wp-content/
+
+# 2) wp-content：默认忽略其下所有内容
+/wp-content/*
+
+# 允许 plugins 与 themes 目录存在
+!/wp-content/plugins/
+!/wp-content/themes/
+
+# 仅跟踪指定插件目录（将 your-plugin-slug 改成你的插件目录名，可复制多行保留多个）
+/wp-content/plugins/*
+!/wp-content/plugins/your-plugin-slug/
+
+# 仅跟踪指定主题目录（将 your-theme-slug 改成你的主题目录名，可复制多行保留多个）
+/wp-content/themes/*
+!/wp-content/themes/your-theme-slug/
+
+# 可选：如需跟踪某个 mu-plugins 子目录，取消以下注释并替换目录名
+# /wp-content/mu-plugins/*
+# !/wp-content/mu-plugins/your-mu-plugin-slug/
+
+# 3) 忽略上传、缓存、升级包、多语言包等可再生/环境相关内容
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/backups/
+/wp-content/languages/
+/wp-content/debug.log
+/wp-content/*.sql
+/wp-content/*.zip
+
+# 4) 忽略 WordPress 与服务器环境文件（通常不建议入库）
+/.htaccess
+/wp-config.php
+/sitemap.xml
+/sitemap*.xml
+*.log
+
+# 5) 依赖与包管理器缓存
+/vendor/
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+/pnpm-debug.log*
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+
+# 6) 环境与本地配置
+/.env
+/.env.*
+/.local
+/.DS_Store
+/Thumbs.db
+/.idea/
+/.vscode/
+
+# 7) macOS 等系统产生的杂项
+/Icon?
+/._*
