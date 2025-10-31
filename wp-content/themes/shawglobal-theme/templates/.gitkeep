@@ -1,0 +1,8 @@
+# Elementor 模板目录
+# 
+# 使用说明：
+# 1. 在 Elementor Theme Builder 中设计模板并保存
+# 2. 在 Elementor > Templates 中导出为 JSON 文件
+# 3. 将 JSON 文件放入此目录
+# 4. 可以通过 Elementor 后台手动导入，或使用自动导入功能
+

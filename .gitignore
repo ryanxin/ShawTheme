@@ -22,7 +22,7 @@
 
 # 仅跟踪指定主题目录（将 your-theme-slug 改成你的主题目录名，可复制多行保留多个）
 /wp-content/themes/*
-!/wp-content/themes/your-theme-slug/
+!/wp-content/themes/shawglobal-theme/
 
 # 可选：如需跟踪某个 mu-plugins 子目录，取消以下注释并替换目录名
 # /wp-content/mu-plugins/*
