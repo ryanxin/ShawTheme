@@ -38,10 +38,13 @@ class Shaw_Immigration_Projects {
         add_action('init', array($this, 'register_post_type'));
         add_action('init', array($this, 'register_taxonomies'));
         
-        // Register ACF fields with multiple hooks for maximum compatibility
+        // Register ACF fields (basic fields only)
         add_action('acf/init', array($this, 'register_acf_fields'), 10);
         add_action('plugins_loaded', array($this, 'register_acf_fields'), 15);
         add_action('after_setup_theme', array($this, 'register_acf_fields'), 10);
+        
+        // Register CMB2 fields (Gallery and Repeater)
+        add_action('cmb2_admin_init', array($this, 'register_cmb2_fields'));
         
         add_action('rest_api_init', array($this, 'register_rest_routes'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
@@ -269,33 +272,17 @@ class Shaw_Immigration_Projects {
                     'toolbar' => 'full',
                     'media_upload' => 1,
                 ),
-                // Project Images Gallery
-                array(
-                    'key' => 'field_project_gallery',
-                    'label' => 'Project Gallery',
-                    'name' => 'project_gallery',
-                    'type' => 'gallery',
-                    'instructions' => 'Upload multiple images for the project gallery',
-                    'return_format' => 'array',
-                    'preview_size' => 'medium',
-                ),
-                // Advantages Section
+                // NOTE: Gallery moved to CMB2 (ACF free doesn't support gallery)
+                // Project Advantages
                 array(
                     'key' => 'field_advantages',
                     'label' => 'Project Advantages',
                     'name' => 'advantages',
-                    'type' => 'repeater',
-                    'instructions' => 'Add project advantages',
-                    'layout' => 'table',
-                    'button_label' => 'Add Advantage',
-                    'sub_fields' => array(
-                        array(
-                            'key' => 'field_advantage_text',
-                            'label' => 'Advantage',
-                            'name' => 'advantage_text',
-                            'type' => 'text',
-                        ),
-                    ),
+                    'type' => 'wysiwyg',
+                    'instructions' => 'List all project advantages',
+                    'tabs' => 'all',
+                    'toolbar' => 'full',
+                    'media_upload' => 0,
                 ),
                 // Application Requirements
                 array(
@@ -327,66 +314,7 @@ class Shaw_Immigration_Projects {
                     'tabs' => 'all',
                     'toolbar' => 'full',
                 ),
-                // Life Videos/Images
-                array(
-                    'key' => 'field_life_media',
-                    'label' => 'Life Media (Food, School, View)',
-                    'name' => 'life_media',
-                    'type' => 'repeater',
-                    'instructions' => 'Add media items for life section',
-                    'layout' => 'row',
-                    'button_label' => 'Add Media',
-                    'sub_fields' => array(
-                        array(
-                            'key' => 'field_life_media_title',
-                            'label' => 'Title',
-                            'name' => 'title',
-                            'type' => 'text',
-                            'instructions' => 'e.g., Food, School, View',
-                        ),
-                        array(
-                            'key' => 'field_life_media_type',
-                            'label' => 'Media Type',
-                            'name' => 'media_type',
-                            'type' => 'select',
-                            'choices' => array(
-                                'image' => 'Image',
-                                'video' => 'Video',
-                            ),
-                            'default_value' => 'image',
-                        ),
-                        array(
-                            'key' => 'field_life_media_image',
-                            'label' => 'Image',
-                            'name' => 'image',
-                            'type' => 'image',
-                            'conditional_logic' => array(
-                                array(
-                                    array(
-                                        'field' => 'field_life_media_type',
-                                        'operator' => '==',
-                                        'value' => 'image',
-                                    ),
-                                ),
-                            ),
-                        ),
-                        array(
-                            'key' => 'field_life_media_video',
-                            'label' => 'Video URL',
-                            'name' => 'video_url',
-                            'type' => 'url',
-                            'conditional_logic' => array(
-                                array(
-                                    array(
-                                        'field' => 'field_life_media_type',
-                                        'operator' => '==',
-                                        'value' => 'video',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
+                // NOTE: Life Media moved to CMB2 (ACF free doesn't support repeater)
                 // Featured/Highlight flag
                 array(
                     'key' => 'field_is_featured',
@@ -579,6 +507,93 @@ class Shaw_Immigration_Projects {
                 'nonce' => wp_create_nonce('wp_rest'),
             ));
         }
+    }
+    
+    /**
+     * Register CMB2 Fields (Gallery and Repeater)
+     * CMB2 is free and fully supports these field types
+     */
+    public function register_cmb2_fields() {
+        if (!function_exists('new_cmb2_box')) {
+            return;
+        }
+        
+        // Project Gallery (using file_list which is like gallery)
+        $gallery_box = new_cmb2_box(array(
+            'id'           => 'project_gallery_metabox',
+            'title'        => __('Project Gallery (CMB2)', 'shaw-immigration-projects'),
+            'object_types' => array('immigration_project'),
+            'context'      => 'normal',
+            'priority'     => 'high',
+        ));
+        
+        $gallery_box->add_field(array(
+            'name'         => __('Gallery Images', 'shaw-immigration-projects'),
+            'desc'         => __('Upload or add multiple images', 'shaw-immigration-projects'),
+            'id'           => 'project_gallery',
+            'type'         => 'file_list',
+            'preview_size' => array(100, 100),
+            'query_args'   => array('type' => 'image'),
+        ));
+        
+        // Life Media (using group repeater with image/video)
+        $life_media_box = new_cmb2_box(array(
+            'id'           => 'project_life_media_metabox',
+            'title'        => __('Life Media - Food, School, View (CMB2)', 'shaw-immigration-projects'),
+            'object_types' => array('immigration_project'),
+            'context'      => 'normal',
+            'priority'     => 'high',
+        ));
+        
+        $life_media_group = $life_media_box->add_field(array(
+            'id'          => 'life_media',
+            'type'        => 'group',
+            'description' => __('Add media items for life section (Food, School, View, etc.)', 'shaw-immigration-projects'),
+            'options'     => array(
+                'group_title'   => __('Media Item {#}', 'shaw-immigration-projects'),
+                'add_button'    => __('Add Another Media', 'shaw-immigration-projects'),
+                'remove_button' => __('Remove Media', 'shaw-immigration-projects'),
+                'sortable'      => true,
+            ),
+        ));
+        
+        $life_media_box->add_group_field($life_media_group, array(
+            'name' => __('Title', 'shaw-immigration-projects'),
+            'desc' => __('e.g., Food, School, View', 'shaw-immigration-projects'),
+            'id'   => 'title',
+            'type' => 'text',
+        ));
+        
+        $life_media_box->add_group_field($life_media_group, array(
+            'name'    => __('Media Type', 'shaw-immigration-projects'),
+            'id'      => 'media_type',
+            'type'    => 'select',
+            'options' => array(
+                'image' => __('Image', 'shaw-immigration-projects'),
+                'video' => __('Video', 'shaw-immigration-projects'),
+            ),
+            'default' => 'image',
+        ));
+        
+        $life_media_box->add_group_field($life_media_group, array(
+            'name' => __('Image', 'shaw-immigration-projects'),
+            'desc' => __('Upload an image (for image type)', 'shaw-immigration-projects'),
+            'id'   => 'image',
+            'type' => 'file',
+            'options' => array(
+                'url' => false,
+            ),
+            'query_args' => array(
+                'type' => 'image',
+            ),
+        ));
+        
+        $life_media_box->add_group_field($life_media_group, array(
+            'name' => __('Video URL', 'shaw-immigration-projects'),
+            'desc' => __('Enter video URL (for video type)', 'shaw-immigration-projects'),
+            'id'   => 'video_url',
+            'type' => 'text_url',
+        ));
     }
     
     /**
