@@ -51,6 +51,16 @@ class Shaw_Immigration_Projects {
         
         // Disabled: Use Elementor Theme Builder instead of PHP template
         // add_filter('single_template', array($this, 'load_custom_template'));
+        
+        // Debug: Track template loading
+        add_action('template_redirect', array($this, 'debug_template_loading'), 1);
+        add_filter('template_include', array($this, 'log_template_include'), 9999);
+        
+        // Ensure Elementor recognizes this CPT for Theme Builder
+        add_filter('elementor/theme/need_override_location', array($this, 'force_elementor_override'), 10, 2);
+        
+        // Add admin menu for debug info
+        add_action('admin_menu', array($this, 'add_debug_menu'));
     }
     
     /**
@@ -607,6 +617,380 @@ class Shaw_Immigration_Projects {
             }
         }
         return $template;
+    }
+    
+    /**
+     * Debug: Track what template is being loaded
+     */
+    public function debug_template_loading() {
+        if (!is_singular('immigration_project')) {
+            return;
+        }
+        
+        // 创建调试日志
+        $debug_info = array(
+            'timestamp' => current_time('mysql'),
+            'post_type' => get_post_type(),
+            'post_id' => get_the_ID(),
+            'is_singular' => is_singular('immigration_project'),
+            'elementor_location' => $this->get_elementor_location_templates(),
+            'active_plugins' => array(
+                'elementor' => defined('ELEMENTOR_VERSION') ? ELEMENTOR_VERSION : 'Not Active',
+                'elementor_pro' => defined('ELEMENTOR_PRO_VERSION') ? ELEMENTOR_PRO_VERSION : 'Not Active',
+            ),
+        );
+        
+        // 保存到临时选项（方便在后台查看）
+        update_option('shaw_immigration_debug_last', $debug_info);
+        
+        // 同时输出到 PHP 错误日志
+        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            error_log('Shaw Immigration Projects - Template Debug: ' . print_r($debug_info, true));
+        }
+    }
+    
+    /**
+     * Log which template file is actually being loaded
+     */
+    public function log_template_include($template) {
+        if (!is_singular('immigration_project')) {
+            return $template;
+        }
+        
+        $template_info = array(
+            'template_file' => $template,
+            'template_type' => $this->identify_template_type($template),
+        );
+        
+        // 更新调试信息
+        $debug_info = get_option('shaw_immigration_debug_last', array());
+        $debug_info['template_info'] = $template_info;
+        update_option('shaw_immigration_debug_last', $debug_info);
+        
+        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+            error_log('Shaw Immigration Projects - Template Include: ' . print_r($template_info, true));
+        }
+        
+        return $template;
+    }
+    
+    /**
+     * Get Elementor location templates for current post
+     */
+    private function get_elementor_location_templates() {
+        if (!class_exists('\ElementorPro\Modules\ThemeBuilder\Module')) {
+            return 'Elementor Pro not active';
+        }
+        
+        try {
+            $location_manager = \ElementorPro\Modules\ThemeBuilder\Module::instance()->get_locations_manager();
+            
+            // 尝试获取 single location（新版可能返回数组）
+            $location = $location_manager->get_location('single');
+            
+            $template_id = null;
+            
+            // 检查 $location 的类型
+            if (is_object($location) && method_exists($location, 'get_template_id')) {
+                $template_id = $location->get_template_id();
+            } elseif (is_array($location) && isset($location['template_id'])) {
+                $template_id = $location['template_id'];
+            }
+            
+            // 如果没有找到，尝试直接通过条件查找
+            if (!$template_id) {
+                $template_id = $this->find_matching_elementor_template();
+            }
+            
+            return array(
+                'template_id' => $template_id,
+                'template_title' => $template_id ? get_the_title($template_id) : 'None',
+                'conditions' => $template_id ? get_post_meta($template_id, '_elementor_conditions', true) : array(),
+                'location_type' => is_object($location) ? 'object' : (is_array($location) ? 'array' : gettype($location)),
+            );
+        } catch (\Exception $e) {
+            return array(
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            );
+        }
+    }
+    
+    /**
+     * Find matching Elementor template by checking conditions
+     */
+    private function find_matching_elementor_template() {
+        if (!is_singular('immigration_project')) {
+            return null;
+        }
+        
+        // 查询所有 Elementor 模板
+        $templates_query = new \WP_Query(array(
+            'post_type' => 'elementor_library',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'meta_query' => array(
+                array(
+                    'key' => '_elementor_template_type',
+                    'value' => array('single', 'single-post', 'single-page'), // 支持新旧版本
+                    'compare' => 'IN',
+                ),
+            ),
+        ));
+        
+        $matched_template = null;
+        
+        if ($templates_query->have_posts()) {
+            while ($templates_query->have_posts()) {
+                $templates_query->the_post();
+                $template_id = get_the_ID();
+                $conditions = get_post_meta($template_id, '_elementor_conditions', true);
+                
+                if (empty($conditions)) {
+                    continue;
+                }
+                
+                // 检查条件是否匹配 immigration_project
+                foreach ($conditions as $condition) {
+                    if (is_string($condition) && strpos($condition, 'immigration_project') !== false) {
+                        $matched_template = $template_id;
+                        break 2;
+                    } elseif (is_array($condition)) {
+                        $condition_string = implode('/', $condition);
+                        if (strpos($condition_string, 'immigration_project') !== false) {
+                            $matched_template = $template_id;
+                            break 2;
+                        }
+                    }
+                }
+            }
+            wp_reset_postdata();
+        }
+        
+        return $matched_template;
+    }
+    
+    /**
+     * Identify what type of template is being used
+     */
+    private function identify_template_type($template_path) {
+        if (strpos($template_path, 'elementor') !== false) {
+            return 'Elementor Theme Builder';
+        } elseif (strpos($template_path, 'shaw-immigration-projects') !== false) {
+            return 'Plugin Custom Template';
+        } elseif (strpos($template_path, 'single-immigration_project.php') !== false) {
+            return 'Theme Single CPT Template';
+        } elseif (strpos($template_path, 'single.php') !== false) {
+            return 'Theme Single Template';
+        } else {
+            return 'Unknown: ' . basename($template_path);
+        }
+    }
+    
+    /**
+     * Force Elementor to check conditions for immigration_project
+     */
+    public function force_elementor_override($need_override, $location) {
+        if (is_singular('immigration_project') && $location === 'single') {
+            return true;
+        }
+        return $need_override;
+    }
+    
+    /**
+     * Add debug menu to admin
+     */
+    public function add_debug_menu() {
+        add_submenu_page(
+            'edit.php?post_type=immigration_project',
+            'Template Debug Info',
+            'Debug Info',
+            'manage_options',
+            'shaw-immigration-debug',
+            array($this, 'render_debug_page')
+        );
+    }
+    
+    /**
+     * Render debug page
+     */
+    public function render_debug_page() {
+        $debug_info = get_option('shaw_immigration_debug_last', array());
+        
+        // 获取所有 Elementor 模板（支持新旧版本）
+        $elementor_templates = array();
+        if (class_exists('\ElementorPro\Modules\ThemeBuilder\Module') || class_exists('\ElementorPro\Modules\ThemeBuilder\Classes\Conditions_Manager')) {
+            $templates_query = new \WP_Query(array(
+                'post_type' => 'elementor_library',
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'meta_query' => array(
+                    array(
+                        'key' => '_elementor_template_type',
+                        'value' => array('single', 'single-post', 'single-page'), // 支持新旧版本
+                        'compare' => 'IN',
+                    ),
+                ),
+            ));
+            
+            if ($templates_query->have_posts()) {
+                while ($templates_query->have_posts()) {
+                    $templates_query->the_post();
+                    $template_id = get_the_ID();
+                    $conditions = get_post_meta($template_id, '_elementor_conditions', true);
+                    $template_type = get_post_meta($template_id, '_elementor_template_type', true);
+                    
+                    $elementor_templates[] = array(
+                        'id' => $template_id,
+                        'title' => get_the_title(),
+                        'type' => $template_type,
+                        'conditions' => $conditions,
+                        'edit_url' => admin_url('post.php?post=' . $template_id . '&action=elementor'),
+                    );
+                }
+                wp_reset_postdata();
+            }
+        }
+        
+        ?>
+        <div class="wrap">
+            <h1>Shaw Immigration Projects - Template Debug Info</h1>
+            
+            <div class="notice notice-info">
+                <p><strong>Instructions:</strong> Visit any Immigration Project detail page, then return here to view debug information.</p>
+            </div>
+            
+            <?php if (empty($debug_info)): ?>
+                <div class="notice notice-warning">
+                    <p>No debug information yet. Please visit an Immigration Project detail page first.</p>
+                </div>
+            <?php else: ?>
+                <div class="card" style="max-width: 100%; margin-top: 20px;">
+                    <h2>Last Visited Page Info</h2>
+                    <table class="widefat">
+                        <tr>
+                            <th style="width: 200px;">Visit Time</th>
+                            <td><?php echo esc_html($debug_info['timestamp'] ?? 'N/A'); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Post Type</th>
+                            <td><code><?php echo esc_html($debug_info['post_type'] ?? 'N/A'); ?></code></td>
+                        </tr>
+                        <tr>
+                            <th>Post ID</th>
+                            <td>
+                                <?php 
+                                $post_id = $debug_info['post_id'] ?? null;
+                                if ($post_id) {
+                                    echo esc_html($post_id);
+                                    echo ' - <a href="' . get_permalink($post_id) . '" target="_blank">View Page</a>';
+                                    echo ' | <a href="' . get_edit_post_link($post_id) . '" target="_blank">Edit</a>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Is Singular</th>
+                            <td><?php echo $debug_info['is_singular'] ? 'Yes' : 'No'; ?></td>
+                        </tr>
+                    </table>
+                </div>
+            <?php endif; ?>
+            
+            <div class="card" style="max-width: 100%; margin-top: 20px;">
+                <h2>All Elementor Single Templates</h2>
+                <p style="color: #666;">
+                    <strong>Note:</strong> Custom post types (like Immigration Project) should appear in <strong>Single Post</strong> conditions.
+                </p>
+                <?php if (empty($elementor_templates)): ?>
+                    <div class="notice notice-warning inline">
+                        <p>No Elementor Single templates found. Possible reasons:</p>
+                        <ul>
+                            <li>Elementor Pro is not activated</li>
+                            <li>No Single templates have been created yet</li>
+                            <li>Templates are not published</li>
+                        </ul>
+                        <p>
+                            <a href="<?php echo admin_url('edit.php?post_type=elementor_library&tabs_group=theme'); ?>" class="button button-primary">
+                                Create Single Template
+                            </a>
+                        </p>
+                    </div>
+                <?php else: ?>
+                    <table class="widefat striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">ID</th>
+                                <th style="width: 120px;">Template Type</th>
+                                <th>Template Name</th>
+                                <th>Conditions</th>
+                                <th style="width: 120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($elementor_templates as $template): ?>
+                                <tr>
+                                    <td><?php echo esc_html($template['id']); ?></td>
+                                    <td>
+                                        <span style="background: #e7f5ff; padding: 3px 8px; border-radius: 3px; font-size: 11px;">
+                                            <?php 
+                                            $type_display = $template['type'] ?? 'single';
+                                            echo esc_html(strtoupper(str_replace('-', ' ', $type_display))); 
+                                            ?>
+                                        </span>
+                                    </td>
+                                    <td><strong><?php echo esc_html($template['title']); ?></strong></td>
+                                    <td>
+                                        <?php if (!empty($template['conditions'])): ?>
+                                            <?php 
+                                            // 检查是否包含或排除 immigration_project
+                                            $has_include = false;
+                                            $has_exclude = false;
+                                            
+                                            foreach ($template['conditions'] as $condition) {
+                                                $condition_str = is_array($condition) ? implode('/', $condition) : $condition;
+                                                if (stripos($condition_str, 'immigration_project') !== false) {
+                                                    if (stripos($condition_str, 'include') !== false) {
+                                                        $has_include = true;
+                                                    } elseif (stripos($condition_str, 'exclude') !== false) {
+                                                        $has_exclude = true;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            $is_active = ($template['id'] == ($debug_info['elementor_location']['template_id'] ?? 0));
+                                            ?>
+                                            <?php if ($is_active): ?>
+                                                <span style="background: #00a32a; color: white; padding: 3px 10px; border-radius: 3px; font-weight: bold;">Currently Active</span><br>
+                                            <?php endif; ?>
+                                            <?php if ($has_include): ?>
+                                                <span style="color: green; font-weight: bold;">Includes Immigration Project</span><br>
+                                            <?php endif; ?>
+                                            <?php if ($has_exclude): ?>
+                                                <span style="color: orange; font-weight: bold;">Excludes Immigration Project</span><br>
+                                            <?php endif; ?>
+                                            <pre style="background: #f5f5f5; padding: 5px; font-size: 11px; max-height: 100px; overflow: auto;"><?php print_r($template['conditions']); ?></pre>
+                                        <?php else: ?>
+                                            <em style="color: #999;">No conditions set</em>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="<?php echo esc_url($template['edit_url']); ?>" class="button button-primary button-small" target="_blank">Edit</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+        </div>
+        <style>
+            .card { padding: 20px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .card h2 { margin-top: 0; }
+            .card table th { text-align: left; font-weight: 600; }
+            .card pre { margin: 0; }
+        </style>
+        <?php
     }
 }
 
