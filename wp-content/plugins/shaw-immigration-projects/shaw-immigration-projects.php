@@ -43,8 +43,10 @@ class Shaw_Immigration_Projects {
         add_action('plugins_loaded', array($this, 'register_acf_fields'), 15);
         add_action('after_setup_theme', array($this, 'register_acf_fields'), 10);
         
-        // Register CMB2 fields (Gallery and Repeater)
-        add_action('cmb2_admin_init', array($this, 'register_cmb2_fields'));
+        // Register Meta Box (gallery) fields + normalize legacy data
+        add_filter('rwmb_meta_boxes', array($this, 'register_meta_box_fields'));
+        add_filter('rwmb_project_gallery_meta', array($this, 'normalize_project_gallery_meta'), 10, 2);
+        add_filter('rwmb_project_gallery_sanitize', array($this, 'sanitize_project_gallery_meta'), 10, 2);
         
         add_action('rest_api_init', array($this, 'register_rest_routes'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
@@ -282,7 +284,7 @@ class Shaw_Immigration_Projects {
                     'toolbar' => 'full',
                     'media_upload' => 1,
                 ),
-                // NOTE: Gallery moved to CMB2 (ACF free doesn't support gallery)
+                // NOTE: Gallery now handled by Meta Box (ACF free doesn't support gallery)
                 // Project Advantages
                 array(
                     'key' => 'field_advantages',
@@ -324,7 +326,7 @@ class Shaw_Immigration_Projects {
                     'tabs' => 'all',
                     'toolbar' => 'full',
                 ),
-                // NOTE: Life Media moved to CMB2 (ACF free doesn't support repeater)
+                // NOTE: Life Media repeater removed for now (ACF free limitation)
                 // Featured/Highlight flag
                 array(
                     'key' => 'field_is_featured',
@@ -520,90 +522,96 @@ class Shaw_Immigration_Projects {
     }
     
     /**
-     * Register CMB2 Fields (Gallery and Repeater)
-     * CMB2 is free and fully supports these field types
+     * Register Meta Box gallery so MB Elementor Integrator can read it directly.
      */
-    public function register_cmb2_fields() {
-        if (!function_exists('new_cmb2_box')) {
-            return;
+    public function register_meta_box_fields($meta_boxes) {
+        $meta_boxes[] = array(
+            'id'         => 'project_gallery_metabox',
+            'title'      => __('Project Gallery', 'shaw-immigration-projects'),
+            'post_types' => array('immigration_project'),
+            'context'    => 'normal',
+            'priority'   => 'high',
+            'autosave'   => true,
+            'fields'     => array(
+                array(
+                    'id'               => 'project_gallery',
+                    'name'             => __('Gallery Images', 'shaw-immigration-projects'),
+                    'type'             => 'image_advanced',
+                    'max_file_uploads' => 25,
+                    'image_size'       => 'thumbnail',
+                    'clone'            => false,
+                    'desc'             => __('Upload or select multiple images for the Elementor carousel.', 'shaw-immigration-projects'),
+                ),
+            ),
+        );
+        
+        return $meta_boxes;
+    }
+    
+    /**
+     * Ensure legacy CMB2 gallery data is converted to attachment IDs for Meta Box UI.
+     */
+    public function normalize_project_gallery_meta($meta, $field = array()) {
+        return $this->prepare_project_gallery_ids($meta);
+    }
+    
+    /**
+     * Make sure anything saved back to the DB is a clean array of attachment IDs.
+     */
+    public function sanitize_project_gallery_meta($meta, $field = array()) {
+        return $this->prepare_project_gallery_ids($meta);
+    }
+    
+    /**
+     * Convert mixed gallery meta into attachment ID arrays.
+     */
+    private function prepare_project_gallery_ids($meta) {
+        if (empty($meta)) {
+            return array();
         }
         
-        // Project Gallery (using file_list which is like gallery)
-        $gallery_box = new_cmb2_box(array(
-            'id'           => 'project_gallery_metabox',
-            'title'        => __('Project Gallery (CMB2)', 'shaw-immigration-projects'),
-            'object_types' => array('immigration_project'),
-            'context'      => 'normal',
-            'priority'     => 'high',
-        ));
+        $ids = array();
         
-        $gallery_box->add_field(array(
-            'name'         => __('Gallery Images', 'shaw-immigration-projects'),
-            'desc'         => __('Upload or add multiple images', 'shaw-immigration-projects'),
-            'id'           => 'project_gallery',
-            'type'         => 'file_list',
-            'preview_size' => array(100, 100),
-            'query_args'   => array('type' => 'image'),
-        ));
+        if (is_array($meta)) {
+            foreach ($meta as $key => $value) {
+                if (is_numeric($value)) {
+                    $ids[] = (int) $value;
+                    continue;
+                }
+                
+                if (is_array($value)) {
+                    $maybe_id = $this->extract_attachment_id_from_array($value);
+                    if ($maybe_id) {
+                        $ids[] = $maybe_id;
+                        continue;
+                    }
+                }
+                
+                if (is_string($value) && is_numeric($key)) {
+                    // Legacy CMB2 format: attachment ID is the array key, value is a URL string.
+                    $ids[] = (int) $key;
+                }
+            }
+        } elseif (is_numeric($meta)) {
+            $ids[] = (int) $meta;
+        }
         
-        // Life Media (using group repeater with image/video)
-        $life_media_box = new_cmb2_box(array(
-            'id'           => 'project_life_media_metabox',
-            'title'        => __('Life Media - Food, School, View (CMB2)', 'shaw-immigration-projects'),
-            'object_types' => array('immigration_project'),
-            'context'      => 'normal',
-            'priority'     => 'high',
-        ));
+        $ids = array_values(array_unique(array_filter($ids)));
         
-        $life_media_group = $life_media_box->add_field(array(
-            'id'          => 'life_media',
-            'type'        => 'group',
-            'description' => __('Add media items for life section (Food, School, View, etc.)', 'shaw-immigration-projects'),
-            'options'     => array(
-                'group_title'   => __('Media Item {#}', 'shaw-immigration-projects'),
-                'add_button'    => __('Add Another Media', 'shaw-immigration-projects'),
-                'remove_button' => __('Remove Media', 'shaw-immigration-projects'),
-                'sortable'      => true,
-            ),
-        ));
-        
-        $life_media_box->add_group_field($life_media_group, array(
-            'name' => __('Title', 'shaw-immigration-projects'),
-            'desc' => __('e.g., Food, School, View', 'shaw-immigration-projects'),
-            'id'   => 'title',
-            'type' => 'text',
-        ));
-        
-        $life_media_box->add_group_field($life_media_group, array(
-            'name'    => __('Media Type', 'shaw-immigration-projects'),
-            'id'      => 'media_type',
-            'type'    => 'select',
-            'options' => array(
-                'image' => __('Image', 'shaw-immigration-projects'),
-                'video' => __('Video', 'shaw-immigration-projects'),
-            ),
-            'default' => 'image',
-        ));
-        
-        $life_media_box->add_group_field($life_media_group, array(
-            'name' => __('Image', 'shaw-immigration-projects'),
-            'desc' => __('Upload an image (for image type)', 'shaw-immigration-projects'),
-            'id'   => 'image',
-            'type' => 'file',
-            'options' => array(
-                'url' => false,
-            ),
-            'query_args' => array(
-                'type' => 'image',
-            ),
-        ));
-        
-        $life_media_box->add_group_field($life_media_group, array(
-            'name' => __('Video URL', 'shaw-immigration-projects'),
-            'desc' => __('Enter video URL (for video type)', 'shaw-immigration-projects'),
-            'id'   => 'video_url',
-            'type' => 'text_url',
-        ));
+        return $ids;
+    }
+    
+    /**
+     * Try to pull an attachment ID from a mixed data array.
+     */
+    private function extract_attachment_id_from_array($value) {
+        $candidates = array('attachment_id', 'id', 'ID');
+        foreach ($candidates as $candidate) {
+            if (isset($value[$candidate]) && is_numeric($value[$candidate])) {
+                return (int) $value[$candidate];
+            }
+        }
+        return 0;
     }
     
     /**
@@ -1011,4 +1019,3 @@ register_activation_hook(__FILE__, function() {
 register_deactivation_hook(__FILE__, function() {
     flush_rewrite_rules();
 });
-
