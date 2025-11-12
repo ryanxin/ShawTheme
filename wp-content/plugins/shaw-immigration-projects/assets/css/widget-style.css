@@ -1,0 +1,444 @@
+/**
+ * Immigration Projects Widget - Frontend Styles
+ */
+
+/* =======================
+   Widget Container
+   ======================= */
+.shaw-immigration-widget {
+    position: relative;
+    width: 100%;
+}
+
+/* =======================
+   Filters Section
+   ======================= */
+.shaw-filters-wrapper {
+    margin-bottom: 40px;
+}
+
+.shaw-filter-section {
+    margin-bottom: 20px;
+}
+
+.shaw-filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.shaw-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.shaw-filter-tab {
+    padding: 12px 24px;
+    border-bottom: 3px solid transparent;
+    color: #707070;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.shaw-filter-tab:hover {
+    color: #1a1448;
+}
+
+.shaw-filter-tab.active {
+    color: #1a1448;
+    border-bottom-color: #1a1448;
+}
+
+.shaw-filter-tab .count {
+    margin-left: 4px;
+    color: inherit;
+    opacity: 0.6;
+    font-size: 14px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .shaw-filter-tabs {
+        gap: 8px;
+    }
+
+    .shaw-filter-tab {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+/* =======================
+   Loading Overlay
+   ======================= */
+.shaw-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 8px;
+}
+
+.shaw-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #1a1448;
+    border-radius: 50%;
+    animation: shaw-spin 1s linear infinite;
+}
+
+@keyframes shaw-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =======================
+   Projects Grid
+   ======================= */
+.shaw-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    transition: opacity 0.3s ease;
+}
+
+/* Dynamic columns based on data attribute */
+.shaw-projects-grid[data-columns="1"] {
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.shaw-projects-grid[data-columns="2"] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.shaw-projects-grid[data-columns="3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.shaw-projects-grid[data-columns="4"] {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.shaw-projects-grid[data-columns="5"] {
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.shaw-projects-grid[data-columns="6"] {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+/* Responsive grid */
+@media (max-width: 1024px) {
+    .shaw-projects-grid[data-columns="4"],
+    .shaw-projects-grid[data-columns="5"],
+    .shaw-projects-grid[data-columns="6"] {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .shaw-projects-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .shaw-projects-grid {
+        grid-template-columns: repeat(1, 1fr) !important;
+        gap: 20px;
+    }
+}
+
+/* =======================
+   Project Card (Default HTML)
+   ======================= */
+.shaw-project-card {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(71, 100, 195, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.shaw-project-card:hover {
+    box-shadow: 0 8px 24px rgba(71, 100, 195, 0.15);
+}
+
+.shaw-project-image {
+    position: relative;
+    width: 100%;
+    padding-top: 66.67%; /* 3:2 aspect ratio */
+    overflow: hidden;
+    background: #f4f6f7;
+}
+
+.shaw-project-image a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.shaw-project-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.shaw-project-card:hover .shaw-project-image img {
+    transform: scale(1.05);
+}
+
+/* Category Badge */
+.shaw-project-category-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 16px;
+    background: rgba(225, 154, 88, 0.95);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+}
+
+.shaw-project-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.shaw-project-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #707070;
+}
+
+.shaw-project-country {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.shaw-project-title {
+    margin: 0 0 12px 0;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.shaw-project-title a {
+    color: #1a1448;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.shaw-project-title a:hover {
+    color: #e19a58;
+}
+
+.shaw-project-description {
+    margin-bottom: 16px;
+    color: #707070;
+    font-size: 15px;
+    line-height: 1.6;
+    flex: 1;
+}
+
+.shaw-project-description p:last-child {
+    margin-bottom: 0;
+}
+
+.shaw-project-info {
+    margin-bottom: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.shaw-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.shaw-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.shaw-info-label {
+    color: #707070;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.shaw-info-value {
+    color: #1a1448;
+    font-weight: 600;
+    text-align: right;
+}
+
+.shaw-project-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+}
+
+.shaw-project-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #e19a58;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.shaw-project-btn:hover {
+    background: #d18847;
+    /* transform: translateX(4px); */
+    color: #ffffff;
+}
+
+.shaw-project-btn svg {
+    transition: transform 0.3s ease;
+}
+
+/* =======================
+   Pagination
+   ======================= */
+.shaw-pagination {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.shaw-pagination-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.shaw-page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    background: #ffffff;
+    border: 1px solid #d1d4e5;
+    border-radius: 6px;
+    color: #1a1448;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.shaw-page-link:hover {
+    background: #1a1448;
+    border-color: #1a1448;
+    color: #ffffff;
+}
+
+.shaw-page-link.active {
+    background: #1a1448;
+    border-color: #1a1448;
+    color: #ffffff;
+    cursor: default;
+}
+
+.shaw-page-link.shaw-page-prev,
+.shaw-page-link.shaw-page-next {
+    min-width: 40px;
+    padding: 0;
+}
+
+.shaw-page-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    color: #707070;
+    font-size: 15px;
+}
+
+/* =======================
+   No Results Message
+   ======================= */
+.shaw-no-results {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.shaw-no-results p {
+    font-size: 18px;
+    color: #707070;
+    margin: 0;
+}
+
+/* =======================
+   Error Message
+   ======================= */
+.shaw-error {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    color: #856404;
+    font-size: 16px;
+}
+
+/* =======================
+   Animation Classes
+   ======================= */
+.shaw-fade-in {
+    animation: shawFadeIn 0.3s ease;
+}
+
+@keyframes shawFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

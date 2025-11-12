@@ -37,32 +37,89 @@ class Shaw_Immigration_Projects {
     private function init_hooks() {
         add_action('init', array($this, 'register_post_type'));
         add_action('init', array($this, 'register_taxonomies'));
-        
+
         // Register ACF fields (basic fields only)
         add_action('acf/init', array($this, 'register_acf_fields'), 10);
         add_action('plugins_loaded', array($this, 'register_acf_fields'), 15);
         add_action('after_setup_theme', array($this, 'register_acf_fields'), 10);
-        
+
         // Register Meta Box (gallery) fields + normalize legacy data
         add_filter('rwmb_meta_boxes', array($this, 'register_meta_box_fields'));
         add_filter('rwmb_project_gallery_meta', array($this, 'normalize_project_gallery_meta'), 10, 2);
         add_filter('rwmb_project_gallery_sanitize', array($this, 'sanitize_project_gallery_meta'), 10, 2);
-        
+
         add_action('rest_api_init', array($this, 'register_rest_routes'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
-        
+
         // Disabled: Use Elementor Theme Builder instead of PHP template
         // add_filter('single_template', array($this, 'load_custom_template'));
-        
+
         // Debug: Track template loading
         add_action('template_redirect', array($this, 'debug_template_loading'), 1);
         add_filter('template_include', array($this, 'log_template_include'), 9999);
-        
+
         // Ensure Elementor recognizes this CPT for Theme Builder
         add_filter('elementor/theme/need_override_location', array($this, 'force_elementor_override'), 10, 2);
-        
+
         // Add admin menu for debug info
         add_action('admin_menu', array($this, 'add_debug_menu'));
+
+        // Register Elementor Widget
+        add_action('elementor/widgets/register', array($this, 'register_elementor_widgets'));
+        add_action('elementor/frontend/after_enqueue_scripts', array($this, 'enqueue_widget_scripts'));
+
+        // Include required files
+        $this->include_files();
+    }
+
+    /**
+     * Include required files
+     */
+    private function include_files() {
+        // Include template renderer
+        require_once SHAW_IMMIGRATION_PATH . 'includes/class-template-renderer.php';
+
+        // Include AJAX handler
+        require_once SHAW_IMMIGRATION_PATH . 'includes/class-ajax-handler.php';
+    }
+
+    /**
+     * Register Elementor Widgets
+     */
+    public function register_elementor_widgets($widgets_manager) {
+        // Include widget file
+        require_once SHAW_IMMIGRATION_PATH . 'includes/widgets/immigration-projects-widget.php';
+
+        // Register widget
+        $widgets_manager->register(new Shaw_Immigration_Projects_Widget());
+    }
+
+    /**
+     * Enqueue Widget Scripts and Styles
+     */
+    public function enqueue_widget_scripts() {
+        // Widget styles
+        wp_enqueue_style(
+            'shaw-immigration-widget',
+            SHAW_IMMIGRATION_URL . 'assets/css/widget-style.css',
+            array(),
+            SHAW_IMMIGRATION_VERSION
+        );
+
+        // Widget script
+        wp_enqueue_script(
+            'shaw-immigration-widget',
+            SHAW_IMMIGRATION_URL . 'assets/js/widget-frontend.js',
+            array('jquery'),
+            SHAW_IMMIGRATION_VERSION,
+            true
+        );
+
+        // Localize script with AJAX URL and nonce
+        wp_localize_script('shaw-immigration-widget', 'shawImmigrationWidget', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('shaw_immigration_nonce'),
+        ));
     }
     
     /**
