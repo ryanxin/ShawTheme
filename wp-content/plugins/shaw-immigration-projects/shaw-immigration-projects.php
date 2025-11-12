@@ -162,13 +162,13 @@ class Shaw_Immigration_Projects {
             'show_in_admin_bar'     => true,
             'show_in_nav_menus'     => true,
             'can_export'            => true,
-            'has_archive'           => true,
+            'has_archive'           => 'immigration-projects',  // Custom archive slug
             'exclude_from_search'   => false,
             'publicly_queryable'    => true,
             'capability_type'       => 'post',
             'show_in_rest'          => true,
             'rest_base'             => 'immigration-projects',
-            'rewrite'               => array('slug' => 'immigration-projects'),
+            'rewrite'               => array('slug' => 'immigration-project'),  // Single post slug
         );
         
         register_post_type('immigration_project', $args);

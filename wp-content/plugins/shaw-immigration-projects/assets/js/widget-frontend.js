@@ -237,17 +237,11 @@
         animateItems() {
             const $items = this.$grid.children();
 
-            $items.css({
-                'opacity': '0',
-                'transform': 'translateY(20px)'
-            });
+            // Simple fade in animation
+            $items.css('opacity', '0');
 
             $items.each(function(index) {
-                $(this).delay(index * 50).animate({
-                    'opacity': 1
-                }, 300, function() {
-                    $(this).css('transform', 'translateY(0)');
-                });
+                $(this).delay(index * 50).fadeTo(300, 1);
             });
         }
 
