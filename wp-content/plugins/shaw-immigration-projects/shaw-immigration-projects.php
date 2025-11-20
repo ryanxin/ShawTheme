@@ -37,11 +37,17 @@ class Shaw_Immigration_Projects {
     private function init_hooks() {
         add_action('init', array($this, 'register_post_type'));
         add_action('init', array($this, 'register_taxonomies'));
+        add_action('init', array($this, 'register_calculator_post_type'));
 
         // Register ACF fields (basic fields only)
         add_action('acf/init', array($this, 'register_acf_fields'), 10);
         add_action('plugins_loaded', array($this, 'register_acf_fields'), 15);
         add_action('after_setup_theme', array($this, 'register_acf_fields'), 10);
+
+        // Register Calculator ACF fields
+        add_action('acf/init', array($this, 'register_calculator_acf_fields'), 10);
+        add_action('plugins_loaded', array($this, 'register_calculator_acf_fields'), 15);
+        add_action('after_setup_theme', array($this, 'register_calculator_acf_fields'), 10);
 
         // Register Meta Box (gallery) fields + normalize legacy data
         add_filter('rwmb_meta_boxes', array($this, 'register_meta_box_fields'));
@@ -68,6 +74,9 @@ class Shaw_Immigration_Projects {
         add_action('elementor/widgets/register', array($this, 'register_elementor_widgets'));
         add_action('elementor/frontend/after_enqueue_scripts', array($this, 'enqueue_widget_scripts'));
 
+        // Register Calculator Shortcode
+        add_shortcode('immigration_calculator', array($this, 'calculator_shortcode'));
+
         // Include required files
         $this->include_files();
     }
@@ -87,11 +96,13 @@ class Shaw_Immigration_Projects {
      * Register Elementor Widgets
      */
     public function register_elementor_widgets($widgets_manager) {
-        // Include widget file
+        // Include widget files
         require_once SHAW_IMMIGRATION_PATH . 'includes/widgets/immigration-projects-widget.php';
+        require_once SHAW_IMMIGRATION_PATH . 'includes/widgets/calculator-widget.php';
 
-        // Register widget
+        // Register widgets
         $widgets_manager->register(new Shaw_Immigration_Projects_Widget());
+        $widgets_manager->register(new Shaw_Immigration_Calculator_Widget());
     }
 
     /**
@@ -1056,6 +1067,192 @@ class Shaw_Immigration_Projects {
             .card pre { margin: 0; }
         </style>
         <?php
+    }
+
+    /**
+     * Register Immigration Calculator Post Type
+     */
+    public function register_calculator_post_type() {
+        $labels = array(
+            'name'                  => _x('Immigration Calculators', 'Post Type General Name', 'shaw-immigration-projects'),
+            'singular_name'         => _x('Immigration Calculator', 'Post Type Singular Name', 'shaw-immigration-projects'),
+            'menu_name'             => __('Calculators', 'shaw-immigration-projects'),
+            'name_admin_bar'        => __('Calculator', 'shaw-immigration-projects'),
+            'archives'              => __('Calculator Archives', 'shaw-immigration-projects'),
+            'attributes'            => __('Calculator Attributes', 'shaw-immigration-projects'),
+            'parent_item_colon'     => __('Parent Calculator:', 'shaw-immigration-projects'),
+            'all_items'             => __('All Calculators', 'shaw-immigration-projects'),
+            'add_new_item'          => __('Add New Calculator', 'shaw-immigration-projects'),
+            'add_new'               => __('Add New', 'shaw-immigration-projects'),
+            'new_item'              => __('New Calculator', 'shaw-immigration-projects'),
+            'edit_item'             => __('Edit Calculator', 'shaw-immigration-projects'),
+            'update_item'           => __('Update Calculator', 'shaw-immigration-projects'),
+            'view_item'             => __('View Calculator', 'shaw-immigration-projects'),
+            'view_items'            => __('View Calculators', 'shaw-immigration-projects'),
+            'search_items'          => __('Search Calculator', 'shaw-immigration-projects'),
+            'not_found'             => __('Not found', 'shaw-immigration-projects'),
+            'not_found_in_trash'    => __('Not found in Trash', 'shaw-immigration-projects'),
+        );
+
+        $args = array(
+            'label'                 => __('Immigration Calculator', 'shaw-immigration-projects'),
+            'description'           => __('Immigration Calculators and Tools', 'shaw-immigration-projects'),
+            'labels'                => $labels,
+            'supports'              => array('title', 'revisions'),
+            'hierarchical'          => false,
+            'public'                => false,
+            'show_ui'               => true,
+            'show_in_menu'          => 'edit.php?post_type=immigration_project',
+            'menu_position'         => 6,
+            'show_in_admin_bar'     => true,
+            'show_in_nav_menus'     => false,
+            'can_export'            => true,
+            'has_archive'           => false,
+            'exclude_from_search'   => true,
+            'publicly_queryable'    => false,
+            'capability_type'       => 'post',
+            'show_in_rest'          => true,
+            'rest_base'             => 'immigration-calculators',
+        );
+
+        register_post_type('immigration_calc', $args);
+    }
+
+    /**
+     * Register ACF Fields for Calculator
+     */
+    public function register_calculator_acf_fields() {
+        if (!function_exists('acf_add_local_field_group')) {
+            return;
+        }
+
+        // Check if already registered to prevent duplicates
+        static $registered = false;
+        if ($registered) {
+            return;
+        }
+        $registered = true;
+
+        acf_add_local_field_group(array(
+            'key' => 'group_immigration_calculator',
+            'title' => 'Calculator Code',
+            'fields' => array(
+                array(
+                    'key' => 'field_calculator_description',
+                    'label' => 'Description',
+                    'name' => 'calculator_description',
+                    'type' => 'textarea',
+                    'instructions' => 'Brief description of what this calculator does (for admin reference)',
+                    'rows' => 2,
+                ),
+                array(
+                    'key' => 'field_calculator_html',
+                    'label' => 'HTML Code',
+                    'name' => 'calculator_html',
+                    'type' => 'textarea',
+                    'instructions' => 'Enter your HTML code here',
+                    'rows' => 15,
+                    'placeholder' => '<div class="calculator-wrapper">
+    <!-- Your HTML here -->
+</div>',
+                ),
+                array(
+                    'key' => 'field_calculator_css',
+                    'label' => 'CSS Code',
+                    'name' => 'calculator_css',
+                    'type' => 'textarea',
+                    'instructions' => 'Enter your CSS code here (without <style> tags)',
+                    'rows' => 15,
+                    'placeholder' => '.calculator-wrapper {
+    /* Your CSS here */
+}',
+                ),
+                array(
+                    'key' => 'field_calculator_js',
+                    'label' => 'JavaScript Code',
+                    'name' => 'calculator_js',
+                    'type' => 'textarea',
+                    'instructions' => 'Enter your JavaScript code here (without <script> tags)',
+                    'rows' => 15,
+                    'placeholder' => '(function($) {
+    // Your JavaScript here
+})(jQuery);',
+                ),
+            ),
+            'location' => array(
+                array(
+                    array(
+                        'param' => 'post_type',
+                        'operator' => '==',
+                        'value' => 'immigration_calc',
+                    ),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+        ));
+    }
+
+    /**
+     * Calculator Shortcode
+     * Usage: [immigration_calculator id="123"]
+     */
+    public function calculator_shortcode($atts) {
+        $atts = shortcode_atts(array(
+            'id' => 0,
+        ), $atts);
+
+        $calculator_id = intval($atts['id']);
+
+        if (!$calculator_id || get_post_type($calculator_id) !== 'immigration_calc') {
+            return '<p>Invalid calculator ID.</p>';
+        }
+
+        return $this->render_calculator($calculator_id);
+    }
+
+    /**
+     * Render Calculator HTML
+     */
+    public function render_calculator($calculator_id) {
+        $html = get_field('calculator_html', $calculator_id);
+        $css = get_field('calculator_css', $calculator_id);
+        $js = get_field('calculator_js', $calculator_id);
+
+        $output = '';
+
+        // Add unique wrapper for scoping
+        $unique_id = 'shaw-calculator-' . $calculator_id;
+        $output .= '<div id="' . esc_attr($unique_id) . '" class="shaw-immigration-calculator">';
+
+        // Add HTML
+        if ($html) {
+            $output .= $html;
+        }
+
+        $output .= '</div>';
+
+        // Add CSS
+        if ($css) {
+            $output .= '<style type="text/css">';
+            $output .= '#' . $unique_id . ' { ' . $css . ' }';
+            $output .= '</style>';
+        }
+
+        // Add JavaScript
+        if ($js) {
+            $output .= '<script type="text/javascript">';
+            $output .= '(function($) {';
+            $output .= 'var calculatorContainer = document.getElementById("' . $unique_id . '");';
+            $output .= $js;
+            $output .= '})(jQuery);';
+            $output .= '</script>';
+        }
+
+        return $output;
     }
 }
 
