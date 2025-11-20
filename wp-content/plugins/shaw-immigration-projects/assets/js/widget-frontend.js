@@ -20,10 +20,13 @@
             this.postsPerPage = this.$widget.data('posts-per-page') || 9;
             this.columns = this.$widget.data('columns') || 3;
 
-            // Current filter state
+            // Current filter state - initialize from DOM (server-rendered state)
+            const $activeCountry = this.$widget.find('.shaw-country-filter .shaw-filter-tab.active');
+            const $activeCategory = this.$widget.find('.shaw-category-filter .shaw-filter-tab.active');
+
             this.filters = {
-                country: 'all',
-                category: 'all',
+                country: $activeCountry.length ? $activeCountry.data('filter-value') : 'all',
+                category: $activeCategory.length ? $activeCategory.data('filter-value') : 'all',
                 paged: 1
             };
 

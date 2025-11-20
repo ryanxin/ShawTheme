@@ -9,32 +9,39 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
+class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
+{
 
-    public function get_name() {
+    public function get_name()
+    {
         return 'shaw_immigration_projects';
     }
 
-    public function get_title() {
+    public function get_title()
+    {
         return __('Immigration Projects Filter', 'shaw-immigration-projects');
     }
 
-    public function get_icon() {
+    public function get_icon()
+    {
         return 'eicon-filter';
     }
 
-    public function get_categories() {
+    public function get_categories()
+    {
         return ['general'];
     }
 
-    public function get_keywords() {
+    public function get_keywords()
+    {
         return ['immigration', 'projects', 'filter', 'ajax', 'shaw'];
     }
 
     /**
      * Register widget controls
      */
-    protected function register_controls() {
+    protected function register_controls()
+    {
 
         // Content Section
         $this->start_controls_section(
@@ -234,7 +241,8 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
     /**
      * Get available Elementor templates
      */
-    private function get_elementor_templates() {
+    private function get_elementor_templates()
+    {
         $templates = ['' => __('Default (Built-in HTML)', 'shaw-immigration-projects')];
 
         if (!class_exists('\Elementor\Plugin')) {
@@ -269,7 +277,8 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
     /**
      * Render widget output on the frontend
      */
-    protected function render() {
+    protected function render()
+    {
         $settings = $this->get_settings_for_display();
 
         // Get filter options
@@ -284,9 +293,15 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
         ]);
 
         // Get initial projects (server-side render for better SEO and initial load)
+        // Check for URL parameters for deep linking
+        $active_country = isset($_GET['project_country']) ? sanitize_text_field($_GET['project_country']) : 'all';
+        $active_category = isset($_GET['project_category']) ? sanitize_text_field($_GET['project_category']) : 'all';
+
         $initial_data = Shaw_Immigration_AJAX_Handler::get_initial_projects([
             'posts_per_page' => $settings['posts_per_page'],
             'template_id' => $settings['loop_template'],
+            'country' => $active_country,
+            'category' => $active_category,
         ]);
 
         ?>
@@ -301,37 +316,37 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
                 <div class="shaw-filters-wrapper">
 
                     <?php if ($settings['show_country_filter'] === 'yes' && !empty($countries)): ?>
-                    <!-- Country Filter -->
-                    <div class="shaw-filter-section shaw-country-filter">
-                        <div class="shaw-filter-tabs">
-                            <div class="shaw-filter-tab active" data-filter-type="country" data-filter-value="all">
-                                全部
-                            </div>
-                            <?php foreach ($countries as $country): ?>
-                                <div class="shaw-filter-tab" data-filter-type="country" data-filter-value="<?php echo esc_attr($country->slug); ?>">
-                                    <?php echo esc_html($country->name); ?>
-                                    <span class="count">(<?php echo $country->count; ?>)</span>
+                        <!-- Country Filter -->
+                        <div class="shaw-filter-section shaw-country-filter">
+                            <div class="shaw-filter-tabs">
+                                <div class="shaw-filter-tab <?php echo ($active_country === 'all') ? 'active' : ''; ?>" data-filter-type="country" data-filter-value="all">
+                                    全部
                                 </div>
-                            <?php endforeach; ?>
+                                <?php foreach ($countries as $country): ?>
+                                    <div class="shaw-filter-tab <?php echo ($active_country === $country->slug) ? 'active' : ''; ?>" data-filter-type="country" data-filter-value="<?php echo esc_attr($country->slug); ?>">
+                                        <?php echo esc_html($country->name); ?>
+                                        <span class="count">(<?php echo $country->count; ?>)</span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                    </div>
                     <?php endif; ?>
 
                     <?php if ($settings['show_category_filter'] === 'yes' && !empty($categories)): ?>
-                    <!-- Category Filter -->
-                    <div class="shaw-filter-section shaw-category-filter">
-                        <div class="shaw-filter-tabs">
-                            <div class="shaw-filter-tab active" data-filter-type="category" data-filter-value="all">
-                                全部
-                            </div>
-                            <?php foreach ($categories as $category): ?>
-                                <div class="shaw-filter-tab" data-filter-type="category" data-filter-value="<?php echo esc_attr($category->slug); ?>">
-                                    <?php echo esc_html($category->name); ?>
-                                    <span class="count">(<?php echo $category->count; ?>)</span>
+                        <!-- Category Filter -->
+                        <div class="shaw-filter-section shaw-category-filter">
+                            <div class="shaw-filter-tabs">
+                                <div class="shaw-filter-tab <?php echo ($active_category === 'all') ? 'active' : ''; ?>" data-filter-type="category" data-filter-value="all">
+                                    全部
                                 </div>
-                            <?php endforeach; ?>
+                                <?php foreach ($categories as $category): ?>
+                                    <div class="shaw-filter-tab <?php echo ($active_category === $category->slug) ? 'active' : ''; ?>" data-filter-type="category" data-filter-value="<?php echo esc_attr($category->slug); ?>">
+                                        <?php echo esc_html($category->name); ?>
+                                        <span class="count">(<?php echo $category->count; ?>)</span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                    </div>
                     <?php endif; ?>
 
                 </div>
@@ -371,50 +386,51 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base {
     /**
      * Render widget output in the editor (Elementor preview)
      */
-    protected function content_template() {
+    protected function content_template()
+    {
         ?>
         <#
-        var widgetId = 'shaw-widget-' + Math.random().toString(36).substr(2, 9);
-        #>
-        <div class="shaw-immigration-widget" data-widget-id="{{ widgetId }}">
+           var widgetId='shaw-widget-' + Math.random().toString(36).substr(2, 9);
+           #>
+            <div class="shaw-immigration-widget" data-widget-id="{{ widgetId }}">
 
-            <# if (settings.show_filters === 'yes') { #>
-            <div class="shaw-filters-wrapper">
+                <# if (settings.show_filters==='yes' ) { #>
+                    <div class="shaw-filters-wrapper">
 
-                <# if (settings.show_country_filter === 'yes') { #>
-                <div class="shaw-filter-section shaw-country-filter">
-                    <div class="shaw-filter-tabs">
-                        <div class="shaw-filter-tab active">全部</div>
-                        <div class="shaw-filter-tab">加拿大 <span class="count">(15)</span></div>
-                        <div class="shaw-filter-tab">土耳其 <span class="count">(8)</span></div>
-                        <div class="shaw-filter-tab">希腊 <span class="count">(5)</span></div>
+                        <# if (settings.show_country_filter==='yes' ) { #>
+                            <div class="shaw-filter-section shaw-country-filter">
+                                <div class="shaw-filter-tabs">
+                                    <div class="shaw-filter-tab active">全部</div>
+                                    <div class="shaw-filter-tab">加拿大 <span class="count">(15)</span></div>
+                                    <div class="shaw-filter-tab">土耳其 <span class="count">(8)</span></div>
+                                    <div class="shaw-filter-tab">希腊 <span class="count">(5)</span></div>
+                                </div>
+                            </div>
+                            <# } #>
+
+                                <# if (settings.show_category_filter==='yes' ) { #>
+                                    <div class="shaw-filter-section shaw-category-filter">
+                                        <div class="shaw-filter-tabs">
+                                            <div class="shaw-filter-tab active">全部</div>
+                                            <div class="shaw-filter-tab">企业家移民 <span class="count">(12)</span></div>
+                                            <div class="shaw-filter-tab">技术移民 <span class="count">(10)</span></div>
+                                        </div>
+                                    </div>
+                                    <# } #>
+
                     </div>
-                </div>
-                <# } #>
+                    <# } #>
 
-                <# if (settings.show_category_filter === 'yes') { #>
-                <div class="shaw-filter-section shaw-category-filter">
-                    <div class="shaw-filter-tabs">
-                        <div class="shaw-filter-tab active">全部</div>
-                        <div class="shaw-filter-tab">企业家移民 <span class="count">(12)</span></div>
-                        <div class="shaw-filter-tab">技术移民 <span class="count">(10)</span></div>
-                    </div>
-                </div>
-                <# } #>
+                        <div class="shaw-projects-grid" data-columns="{{ settings.columns }}">
+                            <div style="text-align: center; padding: 60px 20px; color: #999;">
+                                <p style="font-size: 16px;">Preview: Projects will be loaded here</p>
+                                <p style="font-size: 14px;">Template: {{ settings.loop_template || 'Default HTML' }}</p>
+                                <p style="font-size: 14px;">Posts per page: {{ settings.posts_per_page }}</p>
+                                <p style="font-size: 14px;">Columns: {{ settings.columns }}</p>
+                            </div>
+                        </div>
 
             </div>
-            <# } #>
-
-            <div class="shaw-projects-grid" data-columns="{{ settings.columns }}">
-                <div style="text-align: center; padding: 60px 20px; color: #999;">
-                    <p style="font-size: 16px;">Preview: Projects will be loaded here</p>
-                    <p style="font-size: 14px;">Template: {{ settings.loop_template || 'Default HTML' }}</p>
-                    <p style="font-size: 14px;">Posts per page: {{ settings.posts_per_page }}</p>
-                    <p style="font-size: 14px;">Columns: {{ settings.columns }}</p>
-                </div>
-            </div>
-
-        </div>
-        <?php
+            <?php
     }
 }
