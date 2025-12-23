@@ -3,7 +3,7 @@
  * Plugin Name: Shaw Immigration Projects
  * Plugin URI: https://shawglobal.com
  * Description: Custom Post Type for Immigration Projects with Country and Category taxonomies, AJAX filtering support
- * Version: 1.0.0
+ * Version: 1.2.0
  * Author: Shaw Global
  * Author URI: https://shawglobal.com
  * Text Domain: shaw-immigration-projects
@@ -15,26 +15,30 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('SHAW_IMMIGRATION_VERSION', '1.0.0');
+define('SHAW_IMMIGRATION_VERSION', '1.2.0');
 define('SHAW_IMMIGRATION_PATH', plugin_dir_path(__FILE__));
 define('SHAW_IMMIGRATION_URL', plugin_dir_url(__FILE__));
 
-class Shaw_Immigration_Projects {
-    
+class Shaw_Immigration_Projects
+{
+
     private static $instance = null;
-    
-    public static function get_instance() {
+
+    public static function get_instance()
+    {
         if (null === self::$instance) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-    
-    private function __construct() {
+
+    private function __construct()
+    {
         $this->init_hooks();
     }
-    
-    private function init_hooks() {
+
+    private function init_hooks()
+    {
         add_action('init', array($this, 'register_post_type'));
         add_action('init', array($this, 'register_taxonomies'));
         add_action('init', array($this, 'register_calculator_post_type'));
@@ -84,7 +88,8 @@ class Shaw_Immigration_Projects {
     /**
      * Include required files
      */
-    private function include_files() {
+    private function include_files()
+    {
         // Include template renderer
         require_once SHAW_IMMIGRATION_PATH . 'includes/class-template-renderer.php';
 
@@ -95,7 +100,8 @@ class Shaw_Immigration_Projects {
     /**
      * Register Elementor Widgets
      */
-    public function register_elementor_widgets($widgets_manager) {
+    public function register_elementor_widgets($widgets_manager)
+    {
         // Include widget files
         require_once SHAW_IMMIGRATION_PATH . 'includes/widgets/immigration-projects-widget.php';
         require_once SHAW_IMMIGRATION_PATH . 'includes/widgets/calculator-widget.php';
@@ -108,7 +114,8 @@ class Shaw_Immigration_Projects {
     /**
      * Enqueue Widget Scripts and Styles
      */
-    public function enqueue_widget_scripts() {
+    public function enqueue_widget_scripts()
+    {
         // Widget styles
         wp_enqueue_style(
             'shaw-immigration-widget',
@@ -132,151 +139,154 @@ class Shaw_Immigration_Projects {
             'nonce' => wp_create_nonce('shaw_immigration_nonce'),
         ));
     }
-    
+
     /**
      * Register Custom Post Type
      */
-    public function register_post_type() {
+    public function register_post_type()
+    {
         $labels = array(
-            'name'                  => _x('Immigration Projects', 'Post Type General Name', 'shaw-immigration-projects'),
-            'singular_name'         => _x('Immigration Project', 'Post Type Singular Name', 'shaw-immigration-projects'),
-            'menu_name'             => __('Immigration Projects', 'shaw-immigration-projects'),
-            'name_admin_bar'        => __('Immigration Project', 'shaw-immigration-projects'),
-            'archives'              => __('Project Archives', 'shaw-immigration-projects'),
-            'attributes'            => __('Project Attributes', 'shaw-immigration-projects'),
-            'parent_item_colon'     => __('Parent Project:', 'shaw-immigration-projects'),
-            'all_items'             => __('All Projects', 'shaw-immigration-projects'),
-            'add_new_item'          => __('Add New Project', 'shaw-immigration-projects'),
-            'add_new'               => __('Add New', 'shaw-immigration-projects'),
-            'new_item'              => __('New Project', 'shaw-immigration-projects'),
-            'edit_item'             => __('Edit Project', 'shaw-immigration-projects'),
-            'update_item'           => __('Update Project', 'shaw-immigration-projects'),
-            'view_item'             => __('View Project', 'shaw-immigration-projects'),
-            'view_items'            => __('View Projects', 'shaw-immigration-projects'),
-            'search_items'          => __('Search Project', 'shaw-immigration-projects'),
-            'not_found'             => __('Not found', 'shaw-immigration-projects'),
-            'not_found_in_trash'    => __('Not found in Trash', 'shaw-immigration-projects'),
+            'name' => _x('Immigration Projects', 'Post Type General Name', 'shaw-immigration-projects'),
+            'singular_name' => _x('Immigration Project', 'Post Type Singular Name', 'shaw-immigration-projects'),
+            'menu_name' => __('Immigration Projects', 'shaw-immigration-projects'),
+            'name_admin_bar' => __('Immigration Project', 'shaw-immigration-projects'),
+            'archives' => __('Project Archives', 'shaw-immigration-projects'),
+            'attributes' => __('Project Attributes', 'shaw-immigration-projects'),
+            'parent_item_colon' => __('Parent Project:', 'shaw-immigration-projects'),
+            'all_items' => __('All Projects', 'shaw-immigration-projects'),
+            'add_new_item' => __('Add New Project', 'shaw-immigration-projects'),
+            'add_new' => __('Add New', 'shaw-immigration-projects'),
+            'new_item' => __('New Project', 'shaw-immigration-projects'),
+            'edit_item' => __('Edit Project', 'shaw-immigration-projects'),
+            'update_item' => __('Update Project', 'shaw-immigration-projects'),
+            'view_item' => __('View Project', 'shaw-immigration-projects'),
+            'view_items' => __('View Projects', 'shaw-immigration-projects'),
+            'search_items' => __('Search Project', 'shaw-immigration-projects'),
+            'not_found' => __('Not found', 'shaw-immigration-projects'),
+            'not_found_in_trash' => __('Not found in Trash', 'shaw-immigration-projects'),
         );
-        
+
         $args = array(
-            'label'                 => __('Immigration Project', 'shaw-immigration-projects'),
-            'description'           => __('Immigration Projects and Programs', 'shaw-immigration-projects'),
-            'labels'                => $labels,
-            'supports'              => array('title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields'),
-            'taxonomies'            => array('project_country', 'project_category'),
-            'hierarchical'          => false,
-            'public'                => true,
-            'show_ui'               => true,
-            'show_in_menu'          => true,
-            'menu_position'         => 5,
-            'menu_icon'             => 'dashicons-admin-site-alt3',
-            'show_in_admin_bar'     => true,
-            'show_in_nav_menus'     => true,
-            'can_export'            => true,
-            'has_archive'           => 'immigration-projects',  // Custom archive slug
-            'exclude_from_search'   => false,
-            'publicly_queryable'    => true,
-            'capability_type'       => 'post',
-            'show_in_rest'          => true,
-            'rest_base'             => 'immigration-projects',
-            'rewrite'               => array('slug' => 'immigration-project'),  // Single post slug
+            'label' => __('Immigration Project', 'shaw-immigration-projects'),
+            'description' => __('Immigration Projects and Programs', 'shaw-immigration-projects'),
+            'labels' => $labels,
+            'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields'),
+            'taxonomies' => array('project_country', 'project_category'),
+            'hierarchical' => false,
+            'public' => true,
+            'show_ui' => true,
+            'show_in_menu' => true,
+            'menu_position' => 5,
+            'menu_icon' => 'dashicons-admin-site-alt3',
+            'show_in_admin_bar' => true,
+            'show_in_nav_menus' => true,
+            'can_export' => true,
+            'has_archive' => 'immigration-projects',  // Custom archive slug
+            'exclude_from_search' => false,
+            'publicly_queryable' => true,
+            'capability_type' => 'post',
+            'show_in_rest' => true,
+            'rest_base' => 'immigration-projects',
+            'rewrite' => array('slug' => 'immigration-project'),  // Single post slug
         );
-        
+
         register_post_type('immigration_project', $args);
     }
-    
+
     /**
      * Register Taxonomies
      */
-    public function register_taxonomies() {
+    public function register_taxonomies()
+    {
         // Register Country Taxonomy
         $country_labels = array(
-            'name'                       => _x('Countries', 'Taxonomy General Name', 'shaw-immigration-projects'),
-            'singular_name'              => _x('Country', 'Taxonomy Singular Name', 'shaw-immigration-projects'),
-            'menu_name'                  => __('Countries', 'shaw-immigration-projects'),
-            'all_items'                  => __('All Countries', 'shaw-immigration-projects'),
-            'parent_item'                => __('Parent Country', 'shaw-immigration-projects'),
-            'parent_item_colon'          => __('Parent Country:', 'shaw-immigration-projects'),
-            'new_item_name'              => __('New Country Name', 'shaw-immigration-projects'),
-            'add_new_item'               => __('Add New Country', 'shaw-immigration-projects'),
-            'edit_item'                  => __('Edit Country', 'shaw-immigration-projects'),
-            'update_item'                => __('Update Country', 'shaw-immigration-projects'),
-            'view_item'                  => __('View Country', 'shaw-immigration-projects'),
+            'name' => _x('Countries', 'Taxonomy General Name', 'shaw-immigration-projects'),
+            'singular_name' => _x('Country', 'Taxonomy Singular Name', 'shaw-immigration-projects'),
+            'menu_name' => __('Countries', 'shaw-immigration-projects'),
+            'all_items' => __('All Countries', 'shaw-immigration-projects'),
+            'parent_item' => __('Parent Country', 'shaw-immigration-projects'),
+            'parent_item_colon' => __('Parent Country:', 'shaw-immigration-projects'),
+            'new_item_name' => __('New Country Name', 'shaw-immigration-projects'),
+            'add_new_item' => __('Add New Country', 'shaw-immigration-projects'),
+            'edit_item' => __('Edit Country', 'shaw-immigration-projects'),
+            'update_item' => __('Update Country', 'shaw-immigration-projects'),
+            'view_item' => __('View Country', 'shaw-immigration-projects'),
             'separate_items_with_commas' => __('Separate countries with commas', 'shaw-immigration-projects'),
-            'add_or_remove_items'        => __('Add or remove countries', 'shaw-immigration-projects'),
-            'choose_from_most_used'      => __('Choose from the most used', 'shaw-immigration-projects'),
-            'popular_items'              => __('Popular Countries', 'shaw-immigration-projects'),
-            'search_items'               => __('Search Countries', 'shaw-immigration-projects'),
-            'not_found'                  => __('Not Found', 'shaw-immigration-projects'),
+            'add_or_remove_items' => __('Add or remove countries', 'shaw-immigration-projects'),
+            'choose_from_most_used' => __('Choose from the most used', 'shaw-immigration-projects'),
+            'popular_items' => __('Popular Countries', 'shaw-immigration-projects'),
+            'search_items' => __('Search Countries', 'shaw-immigration-projects'),
+            'not_found' => __('Not Found', 'shaw-immigration-projects'),
         );
-        
+
         $country_args = array(
-            'labels'                     => $country_labels,
-            'hierarchical'               => true,
-            'public'                     => true,
-            'show_ui'                    => true,
-            'show_admin_column'          => true,
-            'show_in_nav_menus'          => true,
-            'show_tagcloud'              => true,
-            'show_in_rest'               => true,
-            'rest_base'                  => 'project-countries',
-            'rewrite'                    => array('slug' => 'project-country'),
+            'labels' => $country_labels,
+            'hierarchical' => true,
+            'public' => true,
+            'show_ui' => true,
+            'show_admin_column' => true,
+            'show_in_nav_menus' => true,
+            'show_tagcloud' => true,
+            'show_in_rest' => true,
+            'rest_base' => 'project-countries',
+            'rewrite' => array('slug' => 'project-country'),
         );
-        
+
         register_taxonomy('project_country', array('immigration_project'), $country_args);
-        
+
         // Register Category Taxonomy
         $category_labels = array(
-            'name'                       => _x('Project Categories', 'Taxonomy General Name', 'shaw-immigration-projects'),
-            'singular_name'              => _x('Project Category', 'Taxonomy Singular Name', 'shaw-immigration-projects'),
-            'menu_name'                  => __('Categories', 'shaw-immigration-projects'),
-            'all_items'                  => __('All Categories', 'shaw-immigration-projects'),
-            'parent_item'                => __('Parent Category', 'shaw-immigration-projects'),
-            'parent_item_colon'          => __('Parent Category:', 'shaw-immigration-projects'),
-            'new_item_name'              => __('New Category Name', 'shaw-immigration-projects'),
-            'add_new_item'               => __('Add New Category', 'shaw-immigration-projects'),
-            'edit_item'                  => __('Edit Category', 'shaw-immigration-projects'),
-            'update_item'                => __('Update Category', 'shaw-immigration-projects'),
-            'view_item'                  => __('View Category', 'shaw-immigration-projects'),
+            'name' => _x('Project Categories', 'Taxonomy General Name', 'shaw-immigration-projects'),
+            'singular_name' => _x('Project Category', 'Taxonomy Singular Name', 'shaw-immigration-projects'),
+            'menu_name' => __('Categories', 'shaw-immigration-projects'),
+            'all_items' => __('All Categories', 'shaw-immigration-projects'),
+            'parent_item' => __('Parent Category', 'shaw-immigration-projects'),
+            'parent_item_colon' => __('Parent Category:', 'shaw-immigration-projects'),
+            'new_item_name' => __('New Category Name', 'shaw-immigration-projects'),
+            'add_new_item' => __('Add New Category', 'shaw-immigration-projects'),
+            'edit_item' => __('Edit Category', 'shaw-immigration-projects'),
+            'update_item' => __('Update Category', 'shaw-immigration-projects'),
+            'view_item' => __('View Category', 'shaw-immigration-projects'),
             'separate_items_with_commas' => __('Separate categories with commas', 'shaw-immigration-projects'),
-            'add_or_remove_items'        => __('Add or remove categories', 'shaw-immigration-projects'),
-            'choose_from_most_used'      => __('Choose from the most used', 'shaw-immigration-projects'),
-            'popular_items'              => __('Popular Categories', 'shaw-immigration-projects'),
-            'search_items'               => __('Search Categories', 'shaw-immigration-projects'),
-            'not_found'                  => __('Not Found', 'shaw-immigration-projects'),
+            'add_or_remove_items' => __('Add or remove categories', 'shaw-immigration-projects'),
+            'choose_from_most_used' => __('Choose from the most used', 'shaw-immigration-projects'),
+            'popular_items' => __('Popular Categories', 'shaw-immigration-projects'),
+            'search_items' => __('Search Categories', 'shaw-immigration-projects'),
+            'not_found' => __('Not Found', 'shaw-immigration-projects'),
         );
-        
+
         $category_args = array(
-            'labels'                     => $category_labels,
-            'hierarchical'               => true,
-            'public'                     => true,
-            'show_ui'                    => true,
-            'show_admin_column'          => true,
-            'show_in_nav_menus'          => true,
-            'show_tagcloud'              => true,
-            'show_in_rest'               => true,
-            'rest_base'                  => 'project-categories',
-            'rewrite'                    => array('slug' => 'project-category'),
+            'labels' => $category_labels,
+            'hierarchical' => true,
+            'public' => true,
+            'show_ui' => true,
+            'show_admin_column' => true,
+            'show_in_nav_menus' => true,
+            'show_tagcloud' => true,
+            'show_in_rest' => true,
+            'rest_base' => 'project-categories',
+            'rewrite' => array('slug' => 'project-category'),
         );
-        
+
         register_taxonomy('project_category', array('immigration_project'), $category_args);
     }
-    
+
     /**
      * Register ACF Fields (programmatically)
      */
-    public function register_acf_fields() {
+    public function register_acf_fields()
+    {
         if (!function_exists('acf_add_local_field_group')) {
             return;
         }
-        
+
         // Check if already registered to prevent duplicates
         static $registered = false;
         if ($registered) {
             return;
         }
         $registered = true;
-        
+
         acf_add_local_field_group(array(
             'key' => 'group_immigration_project_details',
             'title' => 'Project Details',
@@ -288,6 +298,14 @@ class Shaw_Immigration_Projects {
                     'name' => 'processing_period',
                     'type' => 'text',
                     'instructions' => 'e.g., 20 months',
+                    'default_value' => '',
+                ),
+                array(
+                    'key' => 'field_processing_period_link',
+                    'label' => 'Processing Period Link',
+                    'name' => 'processing_period_link',
+                    'type' => 'url',
+                    'instructions' => 'Optional: If provided, processing period text will become a clickable link',
                     'default_value' => '',
                 ),
                 array(
@@ -422,42 +440,44 @@ class Shaw_Immigration_Projects {
             'instruction_placement' => 'label',
         ));
     }
-    
+
     /**
      * Register REST API Routes
      */
-    public function register_rest_routes() {
+    public function register_rest_routes()
+    {
         register_rest_route('shaw-immigration/v1', '/projects', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_filtered_projects'),
             'permission_callback' => '__return_true',
         ));
-        
+
         register_rest_route('shaw-immigration/v1', '/filters', array(
             'methods' => 'GET',
             'callback' => array($this, 'get_filter_options'),
             'permission_callback' => '__return_true',
         ));
     }
-    
+
     /**
      * Get filtered projects via REST API
      */
-    public function get_filtered_projects($request) {
+    public function get_filtered_projects($request)
+    {
         $country = $request->get_param('country');
         $category = $request->get_param('category');
         $posts_per_page = $request->get_param('per_page') ? intval($request->get_param('per_page')) : 9;
         $paged = $request->get_param('page') ? intval($request->get_param('page')) : 1;
-        
+
         $args = array(
             'post_type' => 'immigration_project',
             'posts_per_page' => $posts_per_page,
             'paged' => $paged,
             'post_status' => 'publish',
         );
-        
+
         $tax_query = array('relation' => 'AND');
-        
+
         if ($country && $country !== 'all') {
             $tax_query[] = array(
                 'taxonomy' => 'project_country',
@@ -465,7 +485,7 @@ class Shaw_Immigration_Projects {
                 'terms' => $country,
             );
         }
-        
+
         if ($category && $category !== 'all') {
             $tax_query[] = array(
                 'taxonomy' => 'project_category',
@@ -473,20 +493,20 @@ class Shaw_Immigration_Projects {
                 'terms' => $category,
             );
         }
-        
+
         if (count($tax_query) > 1) {
             $args['tax_query'] = $tax_query;
         }
-        
+
         $query = new WP_Query($args);
-        
+
         $projects = array();
-        
+
         if ($query->have_posts()) {
             while ($query->have_posts()) {
                 $query->the_post();
                 $post_id = get_the_ID();
-                
+
                 $projects[] = array(
                     'id' => $post_id,
                     'title' => get_the_title(),
@@ -502,9 +522,9 @@ class Shaw_Immigration_Projects {
                 );
             }
         }
-        
+
         wp_reset_postdata();
-        
+
         return new WP_REST_Response(array(
             'projects' => $projects,
             'total' => $query->found_posts,
@@ -512,21 +532,22 @@ class Shaw_Immigration_Projects {
             'current_page' => $paged,
         ), 200);
     }
-    
+
     /**
      * Get filter options (countries and categories)
      */
-    public function get_filter_options($request) {
+    public function get_filter_options($request)
+    {
         $countries = get_terms(array(
             'taxonomy' => 'project_country',
             'hide_empty' => true,
         ));
-        
+
         $categories = get_terms(array(
             'taxonomy' => 'project_category',
             'hide_empty' => true,
         ));
-        
+
         $country_options = array();
         foreach ($countries as $country) {
             $country_options[] = array(
@@ -535,7 +556,7 @@ class Shaw_Immigration_Projects {
                 'count' => $country->count,
             );
         }
-        
+
         $category_options = array();
         foreach ($categories as $category) {
             $category_options[] = array(
@@ -544,17 +565,18 @@ class Shaw_Immigration_Projects {
                 'count' => $category->count,
             );
         }
-        
+
         return new WP_REST_Response(array(
             'countries' => $country_options,
             'categories' => $category_options,
         ), 200);
     }
-    
+
     /**
      * Enqueue Scripts and Styles
      */
-    public function enqueue_scripts() {
+    public function enqueue_scripts()
+    {
         if (is_post_type_archive('immigration_project') || is_singular('immigration_project') || is_tax(array('project_country', 'project_category'))) {
             // Main listing styles
             wp_enqueue_style(
@@ -563,7 +585,7 @@ class Shaw_Immigration_Projects {
                 array(),
                 SHAW_IMMIGRATION_VERSION
             );
-            
+
             // Single project styles
             if (is_singular('immigration_project')) {
                 wp_enqueue_style(
@@ -573,7 +595,7 @@ class Shaw_Immigration_Projects {
                     SHAW_IMMIGRATION_VERSION
                 );
             }
-            
+
             wp_enqueue_script(
                 'shaw-immigration-projects',
                 SHAW_IMMIGRATION_URL . 'assets/js/ajax-filter.js',
@@ -581,72 +603,76 @@ class Shaw_Immigration_Projects {
                 SHAW_IMMIGRATION_VERSION,
                 true
             );
-            
+
             wp_localize_script('shaw-immigration-projects', 'shawImmigration', array(
                 'ajaxUrl' => rest_url('shaw-immigration/v1/'),
                 'nonce' => wp_create_nonce('wp_rest'),
             ));
         }
     }
-    
+
     /**
      * Register Meta Box gallery so MB Elementor Integrator can read it directly.
      */
-    public function register_meta_box_fields($meta_boxes) {
+    public function register_meta_box_fields($meta_boxes)
+    {
         $meta_boxes[] = array(
-            'id'         => 'project_gallery_metabox',
-            'title'      => __('Project Gallery', 'shaw-immigration-projects'),
+            'id' => 'project_gallery_metabox',
+            'title' => __('Project Gallery', 'shaw-immigration-projects'),
             'post_types' => array('immigration_project'),
-            'context'    => 'normal',
-            'priority'   => 'high',
-            'autosave'   => true,
-            'fields'     => array(
+            'context' => 'normal',
+            'priority' => 'high',
+            'autosave' => true,
+            'fields' => array(
                 array(
-                    'id'               => 'project_gallery',
-                    'name'             => __('Gallery Images', 'shaw-immigration-projects'),
-                    'type'             => 'image_advanced',
+                    'id' => 'project_gallery',
+                    'name' => __('Gallery Images', 'shaw-immigration-projects'),
+                    'type' => 'image_advanced',
                     'max_file_uploads' => 25,
-                    'image_size'       => 'thumbnail',
-                    'clone'            => false,
-                    'desc'             => __('Upload or select multiple images for the Elementor carousel.', 'shaw-immigration-projects'),
+                    'image_size' => 'thumbnail',
+                    'clone' => false,
+                    'desc' => __('Upload or select multiple images for the Elementor carousel.', 'shaw-immigration-projects'),
                 ),
             ),
         );
-        
+
         return $meta_boxes;
     }
-    
+
     /**
      * Ensure legacy CMB2 gallery data is converted to attachment IDs for Meta Box UI.
      */
-    public function normalize_project_gallery_meta($meta, $field = array()) {
+    public function normalize_project_gallery_meta($meta, $field = array())
+    {
         return $this->prepare_project_gallery_ids($meta);
     }
-    
+
     /**
      * Make sure anything saved back to the DB is a clean array of attachment IDs.
      */
-    public function sanitize_project_gallery_meta($meta, $field = array()) {
+    public function sanitize_project_gallery_meta($meta, $field = array())
+    {
         return $this->prepare_project_gallery_ids($meta);
     }
-    
+
     /**
      * Convert mixed gallery meta into attachment ID arrays.
      */
-    private function prepare_project_gallery_ids($meta) {
+    private function prepare_project_gallery_ids($meta)
+    {
         if (empty($meta)) {
             return array();
         }
-        
+
         $ids = array();
-        
+
         if (is_array($meta)) {
             foreach ($meta as $key => $value) {
                 if (is_numeric($value)) {
                     $ids[] = (int) $value;
                     continue;
                 }
-                
+
                 if (is_array($value)) {
                     $maybe_id = $this->extract_attachment_id_from_array($value);
                     if ($maybe_id) {
@@ -654,7 +680,7 @@ class Shaw_Immigration_Projects {
                         continue;
                     }
                 }
-                
+
                 if (is_string($value) && is_numeric($key)) {
                     // Legacy CMB2 format: attachment ID is the array key, value is a URL string.
                     $ids[] = (int) $key;
@@ -663,16 +689,17 @@ class Shaw_Immigration_Projects {
         } elseif (is_numeric($meta)) {
             $ids[] = (int) $meta;
         }
-        
+
         $ids = array_values(array_unique(array_filter($ids)));
-        
+
         return $ids;
     }
-    
+
     /**
      * Try to pull an attachment ID from a mixed data array.
      */
-    private function extract_attachment_id_from_array($value) {
+    private function extract_attachment_id_from_array($value)
+    {
         $candidates = array('attachment_id', 'id', 'ID');
         foreach ($candidates as $candidate) {
             if (isset($value[$candidate]) && is_numeric($value[$candidate])) {
@@ -681,11 +708,12 @@ class Shaw_Immigration_Projects {
         }
         return 0;
     }
-    
+
     /**
      * Load custom single template
      */
-    public function load_custom_template($template) {
+    public function load_custom_template($template)
+    {
         if (is_singular('immigration_project')) {
             $custom_template = SHAW_IMMIGRATION_PATH . 'templates/single-immigration-project.php';
             if (file_exists($custom_template)) {
@@ -694,15 +722,16 @@ class Shaw_Immigration_Projects {
         }
         return $template;
     }
-    
+
     /**
      * Debug: Track what template is being loaded
      */
-    public function debug_template_loading() {
+    public function debug_template_loading()
+    {
         if (!is_singular('immigration_project')) {
             return;
         }
-        
+
         // 创建调试日志
         $debug_info = array(
             'timestamp' => current_time('mysql'),
@@ -715,69 +744,71 @@ class Shaw_Immigration_Projects {
                 'elementor_pro' => defined('ELEMENTOR_PRO_VERSION') ? ELEMENTOR_PRO_VERSION : 'Not Active',
             ),
         );
-        
+
         // 保存到临时选项（方便在后台查看）
         update_option('shaw_immigration_debug_last', $debug_info);
-        
+
         // 同时输出到 PHP 错误日志
         if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
             error_log('Shaw Immigration Projects - Template Debug: ' . print_r($debug_info, true));
         }
     }
-    
+
     /**
      * Log which template file is actually being loaded
      */
-    public function log_template_include($template) {
+    public function log_template_include($template)
+    {
         if (!is_singular('immigration_project')) {
             return $template;
         }
-        
+
         $template_info = array(
             'template_file' => $template,
             'template_type' => $this->identify_template_type($template),
         );
-        
+
         // 更新调试信息
         $debug_info = get_option('shaw_immigration_debug_last', array());
         $debug_info['template_info'] = $template_info;
         update_option('shaw_immigration_debug_last', $debug_info);
-        
+
         if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
             error_log('Shaw Immigration Projects - Template Include: ' . print_r($template_info, true));
         }
-        
+
         return $template;
     }
-    
+
     /**
      * Get Elementor location templates for current post
      */
-    private function get_elementor_location_templates() {
+    private function get_elementor_location_templates()
+    {
         if (!class_exists('\ElementorPro\Modules\ThemeBuilder\Module')) {
             return 'Elementor Pro not active';
         }
-        
+
         try {
             $location_manager = \ElementorPro\Modules\ThemeBuilder\Module::instance()->get_locations_manager();
-            
+
             // 尝试获取 single location（新版可能返回数组）
             $location = $location_manager->get_location('single');
-            
+
             $template_id = null;
-            
+
             // 检查 $location 的类型
             if (is_object($location) && method_exists($location, 'get_template_id')) {
                 $template_id = $location->get_template_id();
             } elseif (is_array($location) && isset($location['template_id'])) {
                 $template_id = $location['template_id'];
             }
-            
+
             // 如果没有找到，尝试直接通过条件查找
             if (!$template_id) {
                 $template_id = $this->find_matching_elementor_template();
             }
-            
+
             return array(
                 'template_id' => $template_id,
                 'template_title' => $template_id ? get_the_title($template_id) : 'None',
@@ -791,15 +822,16 @@ class Shaw_Immigration_Projects {
             );
         }
     }
-    
+
     /**
      * Find matching Elementor template by checking conditions
      */
-    private function find_matching_elementor_template() {
+    private function find_matching_elementor_template()
+    {
         if (!is_singular('immigration_project')) {
             return null;
         }
-        
+
         // 查询所有 Elementor 模板
         $templates_query = new \WP_Query(array(
             'post_type' => 'elementor_library',
@@ -813,19 +845,19 @@ class Shaw_Immigration_Projects {
                 ),
             ),
         ));
-        
+
         $matched_template = null;
-        
+
         if ($templates_query->have_posts()) {
             while ($templates_query->have_posts()) {
                 $templates_query->the_post();
                 $template_id = get_the_ID();
                 $conditions = get_post_meta($template_id, '_elementor_conditions', true);
-                
+
                 if (empty($conditions)) {
                     continue;
                 }
-                
+
                 // 检查条件是否匹配 immigration_project
                 foreach ($conditions as $condition) {
                     if (is_string($condition) && strpos($condition, 'immigration_project') !== false) {
@@ -842,14 +874,15 @@ class Shaw_Immigration_Projects {
             }
             wp_reset_postdata();
         }
-        
+
         return $matched_template;
     }
-    
+
     /**
      * Identify what type of template is being used
      */
-    private function identify_template_type($template_path) {
+    private function identify_template_type($template_path)
+    {
         if (strpos($template_path, 'elementor') !== false) {
             return 'Elementor Theme Builder';
         } elseif (strpos($template_path, 'shaw-immigration-projects') !== false) {
@@ -862,21 +895,23 @@ class Shaw_Immigration_Projects {
             return 'Unknown: ' . basename($template_path);
         }
     }
-    
+
     /**
      * Force Elementor to check conditions for immigration_project
      */
-    public function force_elementor_override($need_override, $location) {
+    public function force_elementor_override($need_override, $location)
+    {
         if (is_singular('immigration_project') && $location === 'single') {
             return true;
         }
         return $need_override;
     }
-    
+
     /**
      * Add debug menu to admin
      */
-    public function add_debug_menu() {
+    public function add_debug_menu()
+    {
         add_submenu_page(
             'edit.php?post_type=immigration_project',
             'Template Debug Info',
@@ -886,13 +921,14 @@ class Shaw_Immigration_Projects {
             array($this, 'render_debug_page')
         );
     }
-    
+
     /**
      * Render debug page
      */
-    public function render_debug_page() {
+    public function render_debug_page()
+    {
         $debug_info = get_option('shaw_immigration_debug_last', array());
-        
+
         // 获取所有 Elementor 模板（支持新旧版本）
         $elementor_templates = array();
         if (class_exists('\ElementorPro\Modules\ThemeBuilder\Module') || class_exists('\ElementorPro\Modules\ThemeBuilder\Classes\Conditions_Manager')) {
@@ -908,14 +944,14 @@ class Shaw_Immigration_Projects {
                     ),
                 ),
             ));
-            
+
             if ($templates_query->have_posts()) {
                 while ($templates_query->have_posts()) {
                     $templates_query->the_post();
                     $template_id = get_the_ID();
                     $conditions = get_post_meta($template_id, '_elementor_conditions', true);
                     $template_type = get_post_meta($template_id, '_elementor_template_type', true);
-                    
+
                     $elementor_templates[] = array(
                         'id' => $template_id,
                         'title' => get_the_title(),
@@ -927,15 +963,15 @@ class Shaw_Immigration_Projects {
                 wp_reset_postdata();
             }
         }
-        
+
         ?>
         <div class="wrap">
             <h1>Shaw Immigration Projects - Template Debug Info</h1>
-            
+
             <div class="notice notice-info">
                 <p><strong>Instructions:</strong> Visit any Immigration Project detail page, then return here to view debug information.</p>
             </div>
-            
+
             <?php if (empty($debug_info)): ?>
                 <div class="notice notice-warning">
                     <p>No debug information yet. Please visit an Immigration Project detail page first.</p>
@@ -955,7 +991,7 @@ class Shaw_Immigration_Projects {
                         <tr>
                             <th>Post ID</th>
                             <td>
-                                <?php 
+                                <?php
                                 $post_id = $debug_info['post_id'] ?? null;
                                 if ($post_id) {
                                     echo esc_html($post_id);
@@ -972,7 +1008,7 @@ class Shaw_Immigration_Projects {
                     </table>
                 </div>
             <?php endif; ?>
-            
+
             <div class="card" style="max-width: 100%; margin-top: 20px;">
                 <h2>All Elementor Single Templates</h2>
                 <p style="color: #666;">
@@ -1009,20 +1045,20 @@ class Shaw_Immigration_Projects {
                                     <td><?php echo esc_html($template['id']); ?></td>
                                     <td>
                                         <span style="background: #e7f5ff; padding: 3px 8px; border-radius: 3px; font-size: 11px;">
-                                            <?php 
+                                            <?php
                                             $type_display = $template['type'] ?? 'single';
-                                            echo esc_html(strtoupper(str_replace('-', ' ', $type_display))); 
+                                            echo esc_html(strtoupper(str_replace('-', ' ', $type_display)));
                                             ?>
                                         </span>
                                     </td>
                                     <td><strong><?php echo esc_html($template['title']); ?></strong></td>
                                     <td>
                                         <?php if (!empty($template['conditions'])): ?>
-                                            <?php 
+                                            <?php
                                             // 检查是否包含或排除 immigration_project
                                             $has_include = false;
                                             $has_exclude = false;
-                                            
+
                                             foreach ($template['conditions'] as $condition) {
                                                 $condition_str = is_array($condition) ? implode('/', $condition) : $condition;
                                                 if (stripos($condition_str, 'immigration_project') !== false) {
@@ -1033,7 +1069,7 @@ class Shaw_Immigration_Projects {
                                                     }
                                                 }
                                             }
-                                            
+
                                             $is_active = ($template['id'] == ($debug_info['elementor_location']['template_id'] ?? 0));
                                             ?>
                                             <?php if ($is_active): ?>
@@ -1061,10 +1097,24 @@ class Shaw_Immigration_Projects {
             </div>
         </div>
         <style>
-            .card { padding: 20px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-            .card h2 { margin-top: 0; }
-            .card table th { text-align: left; font-weight: 600; }
-            .card pre { margin: 0; }
+            .card {
+                padding: 20px;
+                background: white;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .card h2 {
+                margin-top: 0;
+            }
+
+            .card table th {
+                text-align: left;
+                font-weight: 600;
+            }
+
+            .card pre {
+                margin: 0;
+            }
         </style>
         <?php
     }
@@ -1072,47 +1122,48 @@ class Shaw_Immigration_Projects {
     /**
      * Register Immigration Calculator Post Type
      */
-    public function register_calculator_post_type() {
+    public function register_calculator_post_type()
+    {
         $labels = array(
-            'name'                  => _x('Immigration Calculators', 'Post Type General Name', 'shaw-immigration-projects'),
-            'singular_name'         => _x('Immigration Calculator', 'Post Type Singular Name', 'shaw-immigration-projects'),
-            'menu_name'             => __('Calculators', 'shaw-immigration-projects'),
-            'name_admin_bar'        => __('Calculator', 'shaw-immigration-projects'),
-            'archives'              => __('Calculator Archives', 'shaw-immigration-projects'),
-            'attributes'            => __('Calculator Attributes', 'shaw-immigration-projects'),
-            'parent_item_colon'     => __('Parent Calculator:', 'shaw-immigration-projects'),
-            'all_items'             => __('All Calculators', 'shaw-immigration-projects'),
-            'add_new_item'          => __('Add New Calculator', 'shaw-immigration-projects'),
-            'add_new'               => __('Add New', 'shaw-immigration-projects'),
-            'new_item'              => __('New Calculator', 'shaw-immigration-projects'),
-            'edit_item'             => __('Edit Calculator', 'shaw-immigration-projects'),
-            'update_item'           => __('Update Calculator', 'shaw-immigration-projects'),
-            'view_item'             => __('View Calculator', 'shaw-immigration-projects'),
-            'view_items'            => __('View Calculators', 'shaw-immigration-projects'),
-            'search_items'          => __('Search Calculator', 'shaw-immigration-projects'),
-            'not_found'             => __('Not found', 'shaw-immigration-projects'),
-            'not_found_in_trash'    => __('Not found in Trash', 'shaw-immigration-projects'),
+            'name' => _x('Immigration Calculators', 'Post Type General Name', 'shaw-immigration-projects'),
+            'singular_name' => _x('Immigration Calculator', 'Post Type Singular Name', 'shaw-immigration-projects'),
+            'menu_name' => __('Calculators', 'shaw-immigration-projects'),
+            'name_admin_bar' => __('Calculator', 'shaw-immigration-projects'),
+            'archives' => __('Calculator Archives', 'shaw-immigration-projects'),
+            'attributes' => __('Calculator Attributes', 'shaw-immigration-projects'),
+            'parent_item_colon' => __('Parent Calculator:', 'shaw-immigration-projects'),
+            'all_items' => __('All Calculators', 'shaw-immigration-projects'),
+            'add_new_item' => __('Add New Calculator', 'shaw-immigration-projects'),
+            'add_new' => __('Add New', 'shaw-immigration-projects'),
+            'new_item' => __('New Calculator', 'shaw-immigration-projects'),
+            'edit_item' => __('Edit Calculator', 'shaw-immigration-projects'),
+            'update_item' => __('Update Calculator', 'shaw-immigration-projects'),
+            'view_item' => __('View Calculator', 'shaw-immigration-projects'),
+            'view_items' => __('View Calculators', 'shaw-immigration-projects'),
+            'search_items' => __('Search Calculator', 'shaw-immigration-projects'),
+            'not_found' => __('Not found', 'shaw-immigration-projects'),
+            'not_found_in_trash' => __('Not found in Trash', 'shaw-immigration-projects'),
         );
 
         $args = array(
-            'label'                 => __('Immigration Calculator', 'shaw-immigration-projects'),
-            'description'           => __('Immigration Calculators and Tools', 'shaw-immigration-projects'),
-            'labels'                => $labels,
-            'supports'              => array('title', 'revisions'),
-            'hierarchical'          => false,
-            'public'                => false,
-            'show_ui'               => true,
-            'show_in_menu'          => 'edit.php?post_type=immigration_project',
-            'menu_position'         => 6,
-            'show_in_admin_bar'     => true,
-            'show_in_nav_menus'     => false,
-            'can_export'            => true,
-            'has_archive'           => false,
-            'exclude_from_search'   => true,
-            'publicly_queryable'    => false,
-            'capability_type'       => 'post',
-            'show_in_rest'          => true,
-            'rest_base'             => 'immigration-calculators',
+            'label' => __('Immigration Calculator', 'shaw-immigration-projects'),
+            'description' => __('Immigration Calculators and Tools', 'shaw-immigration-projects'),
+            'labels' => $labels,
+            'supports' => array('title', 'revisions'),
+            'hierarchical' => false,
+            'public' => false,
+            'show_ui' => true,
+            'show_in_menu' => 'edit.php?post_type=immigration_project',
+            'menu_position' => 6,
+            'show_in_admin_bar' => true,
+            'show_in_nav_menus' => false,
+            'can_export' => true,
+            'has_archive' => false,
+            'exclude_from_search' => true,
+            'publicly_queryable' => false,
+            'capability_type' => 'post',
+            'show_in_rest' => true,
+            'rest_base' => 'immigration-calculators',
         );
 
         register_post_type('immigration_calc', $args);
@@ -1121,7 +1172,8 @@ class Shaw_Immigration_Projects {
     /**
      * Register ACF Fields for Calculator
      */
-    public function register_calculator_acf_fields() {
+    public function register_calculator_acf_fields()
+    {
         if (!function_exists('acf_add_local_field_group')) {
             return;
         }
@@ -1200,7 +1252,8 @@ class Shaw_Immigration_Projects {
      * Calculator Shortcode
      * Usage: [immigration_calculator id="123"]
      */
-    public function calculator_shortcode($atts) {
+    public function calculator_shortcode($atts)
+    {
         $atts = shortcode_atts(array(
             'id' => 0,
         ), $atts);
@@ -1217,7 +1270,8 @@ class Shaw_Immigration_Projects {
     /**
      * Render Calculator HTML
      */
-    public function render_calculator($calculator_id) {
+    public function render_calculator($calculator_id)
+    {
         $html = get_field('calculator_html', $calculator_id);
         $css = get_field('calculator_css', $calculator_id);
         $js = get_field('calculator_js', $calculator_id);
@@ -1257,19 +1311,20 @@ class Shaw_Immigration_Projects {
 }
 
 // Initialize the plugin
-function shaw_immigration_projects_init() {
+function shaw_immigration_projects_init()
+{
     return Shaw_Immigration_Projects::get_instance();
 }
 
 add_action('plugins_loaded', 'shaw_immigration_projects_init');
 
 // Activation hook
-register_activation_hook(__FILE__, function() {
+register_activation_hook(__FILE__, function () {
     shaw_immigration_projects_init();
     flush_rewrite_rules();
 });
 
 // Deactivation hook
-register_deactivation_hook(__FILE__, function() {
+register_deactivation_hook(__FILE__, function () {
     flush_rewrite_rules();
 });

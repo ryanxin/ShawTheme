@@ -1,0 +1,473 @@
+/**
+ * Shaw Events Widget - Frontend Styles
+ * Primary Color: #1A1448
+ * Accent Color: #E19A58
+ */
+
+/* =======================
+   Widget Container
+   ======================= */
+.shaw-events-widget {
+    position: relative;
+    width: 100%;
+}
+
+/* =======================
+   Events List
+   ======================= */
+.shaw-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* =======================
+   Event Card
+   ======================= */
+.shaw-event-card {
+    display: flex;
+    flex-direction: row;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(26, 20, 72, 0.06);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.shaw-event-card:hover {
+    box-shadow: 0 8px 24px rgba(26, 20, 72, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Non-clickable cards */
+.shaw-event-card.no-click {
+    cursor: default;
+}
+
+.shaw-event-card.no-click:hover {
+    transform: none;
+}
+
+/* Expired Event Styles */
+.shaw-event-card.is-expired {
+    opacity: 0.65;
+}
+
+.shaw-event-card.is-expired .shaw-event-image {
+    filter: grayscale(50%);
+}
+
+.shaw-event-card.is-expired .shaw-event-title {
+    color: #707070;
+}
+
+.shaw-event-card.is-expired .shaw-event-date-badge {
+    background: rgba(200, 200, 200, 0.95);
+}
+
+.shaw-event-card.is-expired .shaw-event-date-badge .date-day,
+.shaw-event-card.is-expired .shaw-event-date-badge .date-month {
+    color: #707070;
+}
+
+.shaw-event-expired-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    background: rgba(100, 100, 100, 0.85);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    z-index: 3;
+}
+
+/* =======================
+   Image Section (Left)
+   ======================= */
+.shaw-event-image-section {
+    position: relative;
+    flex-shrink: 0;
+    width: 200px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* When card has image */
+.shaw-event-card.has-image .shaw-event-image-section {
+    background: #f4f6f7;
+}
+
+/* When card has no image */
+.shaw-event-card.no-image .shaw-event-image-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+}
+
+.shaw-event-image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+.shaw-event-image {
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: zoom-in;
+}
+
+.shaw-event-card:hover .shaw-event-image {
+    transform: scale(1.05);
+}
+
+/* Semi-transparent overlay for image */
+.shaw-event-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(26, 20, 72, 0) 0%,
+        rgba(26, 20, 72, 0.3) 50%,
+        rgba(26, 20, 72, 0.6) 100%
+    );
+    pointer-events: none;
+}
+
+/* =======================
+   Date Badge
+   ======================= */
+.shaw-event-date-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 12px;
+    border-radius: 8px;
+    z-index: 2;
+}
+
+/* Date badge when on image (positioned absolutely) */
+.shaw-event-date-badge.on-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 90px;
+}
+
+/* Date badge when standalone (no image) */
+.shaw-event-date-badge.standalone {
+    background: #ffffff;
+    border: 2px solid #E19A58;
+    min-width: 120px;
+}
+
+.shaw-event-date-badge .date-day {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1A1448;
+    line-height: 1;
+}
+
+.shaw-event-date-badge .date-month {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1A1448;
+    text-transform: capitalize;
+    margin-top: 4px;
+}
+
+.shaw-event-date-badge .date-year {
+    font-size: 13px;
+    font-weight: 500;
+    color: #707070;
+    margin-top: 2px;
+}
+
+/* =======================
+   Content Section (Right)
+   ======================= */
+.shaw-event-content {
+    flex: 1;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+/* =======================
+   Language Tag
+   ======================= */
+.shaw-event-language {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    width: fit-content;
+}
+
+.shaw-event-language.chinese {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+.shaw-event-language.english {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+/* =======================
+   Title
+   ======================= */
+.shaw-event-title {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1A1448;
+    padding-right: 100px; /* Space for signup button */
+}
+
+/* =======================
+   Meta Info
+   ======================= */
+.shaw-event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #707070;
+    font-size: 14px;
+}
+
+.shaw-event-time,
+.shaw-event-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shaw-event-time svg,
+.shaw-event-location svg {
+    flex-shrink: 0;
+    color: #E19A58;
+}
+
+.shaw-event-speaker {
+    margin-top: 4px;
+}
+
+.shaw-event-speaker strong {
+    color: #1A1448;
+}
+
+/* =======================
+   Sign Up Button
+   ======================= */
+.shaw-event-signup-btn {
+    position: absolute;
+    top: 50%;
+    right: 28px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    background: #E19A58;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.shaw-event-signup-btn:hover {
+    background: #d18847;
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.02);
+}
+
+/* =======================
+   Empty State
+   ======================= */
+.shaw-events-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.shaw-events-empty p {
+    font-size: 16px;
+    color: #707070;
+    margin: 0;
+}
+
+/* =======================
+   Lightbox Modal
+   ======================= */
+.shaw-events-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shaw-lightbox-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+}
+
+.shaw-lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    z-index: 1;
+}
+
+.shaw-lightbox-image {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.shaw-lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.shaw-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* =======================
+   Responsive Design
+   ======================= */
+@media (max-width: 768px) {
+    .shaw-event-card {
+        flex-direction: column;
+    }
+    
+    .shaw-event-image-section {
+        width: 100%;
+        height: 180px;
+        min-height: auto;
+    }
+    
+    .shaw-event-card.no-image .shaw-event-image-section {
+        height: auto;
+        padding: 24px;
+    }
+    
+    .shaw-event-content {
+        padding: 20px;
+    }
+    
+    .shaw-event-title {
+        padding-right: 0;
+        font-size: 18px;
+    }
+    
+    .shaw-event-signup-btn {
+        position: static;
+        transform: none;
+        margin-top: 16px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .shaw-event-date-badge.on-image {
+        position: static;
+        transform: none;
+        margin: 20px auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .shaw-events-list {
+        gap: 16px;
+    }
+    
+    .shaw-event-content {
+        padding: 16px;
+    }
+    
+    .shaw-event-meta {
+        font-size: 13px;
+    }
+    
+    .shaw-event-date-badge .date-day {
+        font-size: 28px;
+    }
+}
+
+/* =======================
+   Animation
+   ======================= */
+.shaw-event-card {
+    animation: shawEventFadeIn 0.4s ease forwards;
+    opacity: 0;
+}
+
+.shaw-event-card:nth-child(1) { animation-delay: 0.1s; }
+.shaw-event-card:nth-child(2) { animation-delay: 0.2s; }
+.shaw-event-card:nth-child(3) { animation-delay: 0.3s; }
+.shaw-event-card:nth-child(4) { animation-delay: 0.4s; }
+.shaw-event-card:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes shawEventFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -307,6 +307,16 @@
     text-align: right;
 }
 
+.shaw-info-value a {
+    color: #e19a58;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.shaw-info-value a:hover {
+    color: #d18847;
+}
+
 .shaw-project-footer {
     display: flex;
     justify-content: flex-end;

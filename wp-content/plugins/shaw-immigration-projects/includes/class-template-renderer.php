@@ -9,7 +9,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Shaw_Immigration_Template_Renderer {
+class Shaw_Immigration_Template_Renderer
+{
 
     /**
      * Render a single project using Elementor template or default HTML
@@ -18,7 +19,8 @@ class Shaw_Immigration_Template_Renderer {
      * @param int $template_id Elementor template ID (optional)
      * @return string Rendered HTML
      */
-    public static function render_project($post_id, $template_id = 0) {
+    public static function render_project($post_id, $template_id = 0)
+    {
         if (!$post_id || !get_post($post_id)) {
             return '';
         }
@@ -39,7 +41,8 @@ class Shaw_Immigration_Template_Renderer {
      * @param int $template_id Elementor template ID
      * @return string Rendered HTML
      */
-    private static function render_with_elementor_template($post_id, $template_id) {
+    private static function render_with_elementor_template($post_id, $template_id)
+    {
         if (!class_exists('\Elementor\Plugin')) {
             return self::render_default_html($post_id);
         }
@@ -97,13 +100,15 @@ class Shaw_Immigration_Template_Renderer {
      * @param int $post_id Project post ID
      * @return string Rendered HTML
      */
-    private static function render_default_html($post_id) {
+    private static function render_default_html($post_id)
+    {
         // Get project data
         $title = get_the_title($post_id);
         $permalink = get_permalink($post_id);
         $card_image = get_field('card_image', $post_id);
         $short_description = get_field('short_description', $post_id);
         $processing_period = get_field('processing_period', $post_id);
+        $processing_period_link = get_field('processing_period_link', $post_id);
         $identity_type = get_field('identity_type', $post_id);
         $investment_amount = get_field('investment_amount', $post_id);
         $residential_requirements = get_field('residential_requirements', $post_id);
@@ -132,17 +137,17 @@ class Shaw_Immigration_Template_Renderer {
         <div class="shaw-project-card" data-post-id="<?php echo esc_attr($post_id); ?>">
 
             <?php if ($image_url): ?>
-            <div class="shaw-project-image">
-                <a href="<?php echo esc_url($permalink); ?>">
-                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>">
-                </a>
+                <div class="shaw-project-image">
+                    <a href="<?php echo esc_url($permalink); ?>">
+                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>">
+                    </a>
 
-                <?php if (!empty($categories)): ?>
-                <div class="shaw-project-category-badge">
-                    <?php echo esc_html($categories[0]->name); ?>
+                    <?php if (!empty($categories)): ?>
+                        <div class="shaw-project-category-badge">
+                            <?php echo esc_html($categories[0]->name); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
-            </div>
             <?php endif; ?>
 
             <div class="shaw-project-content">
@@ -154,45 +159,51 @@ class Shaw_Immigration_Template_Renderer {
                 </h3>
 
                 <?php if ($short_description): ?>
-                <div class="shaw-project-description">
-                    <?php echo wp_kses_post(wpautop($short_description)); ?>
-                </div>
+                    <div class="shaw-project-description">
+                        <?php echo wp_kses_post(wpautop($short_description)); ?>
+                    </div>
                 <?php endif; ?>
 
                 <div class="shaw-project-info">
                     <?php if ($processing_period): ?>
-                    <div class="shaw-info-item">
-                        <span class="shaw-info-label">办理周期：</span>
-                        <span class="shaw-info-value"><?php echo esc_html($processing_period); ?></span>
-                    </div>
+                        <div class="shaw-info-item">
+                            <span class="shaw-info-label">办理周期：</span>
+                            <span class="shaw-info-value">
+                                <?php if ($processing_period_link): ?>
+                                    <a href="<?php echo esc_url($processing_period_link); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($processing_period); ?></a>
+                                <?php else: ?>
+                                    <?php echo esc_html($processing_period); ?>
+                                <?php endif; ?>
+                            </span>
+                        </div>
                     <?php endif; ?>
 
                     <?php if ($identity_type): ?>
-                    <div class="shaw-info-item">
-                        <span class="shaw-info-label">身份类型：</span>
-                        <span class="shaw-info-value"><?php echo esc_html($identity_type); ?></span>
-                    </div>
+                        <div class="shaw-info-item">
+                            <span class="shaw-info-label">身份类型：</span>
+                            <span class="shaw-info-value"><?php echo esc_html($identity_type); ?></span>
+                        </div>
                     <?php endif; ?>
 
                     <?php if ($investment_amount): ?>
-                    <div class="shaw-info-item">
-                        <span class="shaw-info-label">投资金额：</span>
-                        <span class="shaw-info-value"><?php echo esc_html($investment_amount); ?></span>
-                    </div>
+                        <div class="shaw-info-item">
+                            <span class="shaw-info-label">投资金额：</span>
+                            <span class="shaw-info-value"><?php echo esc_html($investment_amount); ?></span>
+                        </div>
                     <?php endif; ?>
 
                     <?php if ($residential_requirements): ?>
-                    <div class="shaw-info-item">
-                        <span class="shaw-info-label">居住要求：</span>
-                        <span class="shaw-info-value"><?php echo esc_html($residential_requirements); ?></span>
-                    </div>
+                        <div class="shaw-info-item">
+                            <span class="shaw-info-label">居住要求：</span>
+                            <span class="shaw-info-value"><?php echo esc_html($residential_requirements); ?></span>
+                        </div>
                     <?php endif; ?>
 
                     <?php if ($language): ?>
-                    <div class="shaw-info-item">
-                        <span class="shaw-info-label">语言要求：</span>
-                        <span class="shaw-info-value"><?php echo esc_html($language); ?></span>
-                    </div>
+                        <div class="shaw-info-item">
+                            <span class="shaw-info-label">语言要求：</span>
+                            <span class="shaw-info-value"><?php echo esc_html($language); ?></span>
+                        </div>
                     <?php endif; ?>
                 </div>
 
@@ -200,7 +211,7 @@ class Shaw_Immigration_Template_Renderer {
                     <a href="<?php echo esc_url($permalink); ?>" class="shaw-project-btn">
                         咨询价格
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1l7 7-7 7M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 1l7 7-7 7M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </a>
                 </div>
@@ -219,7 +230,8 @@ class Shaw_Immigration_Template_Renderer {
      * @param int $template_id Elementor template ID (optional)
      * @return string Rendered HTML
      */
-    public static function render_projects($post_ids, $template_id = 0) {
+    public static function render_projects($post_ids, $template_id = 0)
+    {
         if (empty($post_ids)) {
             return '';
         }
@@ -238,7 +250,8 @@ class Shaw_Immigration_Template_Renderer {
      * @param array $args Query arguments
      * @return WP_Query
      */
-    public static function get_projects_query($args = []) {
+    public static function get_projects_query($args = [])
+    {
         $defaults = [
             'post_type' => 'immigration_project',
             'post_status' => 'publish',
