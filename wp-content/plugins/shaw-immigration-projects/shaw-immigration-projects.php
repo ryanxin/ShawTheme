@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Shaw Immigration Projects
  * Plugin URI: https://shawglobal.com
- * Description: Custom Post Type for Immigration Projects with Country and Category taxonomies, AJAX filtering support
- * Version: 1.2.0
+ * Description: Custom Post Type for Immigration Projects with Country, Category and Type taxonomies, AJAX filtering support
+ * Version: 1.2.2
  * Author: Shaw Global
  * Author URI: https://shawglobal.com
  * Text Domain: shaw-immigration-projects
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('SHAW_IMMIGRATION_VERSION', '1.2.0');
+define('SHAW_IMMIGRATION_VERSION', '1.2.2');
 define('SHAW_IMMIGRATION_PATH', plugin_dir_path(__FILE__));
 define('SHAW_IMMIGRATION_URL', plugin_dir_url(__FILE__));
 
@@ -81,8 +81,77 @@ class Shaw_Immigration_Projects
         // Register Calculator Shortcode
         add_shortcode('immigration_calculator', array($this, 'calculator_shortcode'));
 
+        // Admin settings
+        add_action('admin_init', array($this, 'register_settings'));
+
         // Include required files
         $this->include_files();
+    }
+
+    /**
+     * Register settings
+     */
+    public function register_settings()
+    {
+        register_setting('shaw_immigration_settings', 'shaw_immigration_language', array(
+            'type' => 'string',
+            'default' => 'zh',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+    }
+
+    /**
+     * Get translated text
+     */
+    public static function get_text($key)
+    {
+        $language = get_option('shaw_immigration_language', 'zh');
+
+        $translations = array(
+            'all' => array(
+                'zh' => '全部',
+                'en' => 'All',
+            ),
+            'no_projects' => array(
+                'zh' => '没有找到项目。',
+                'en' => 'No projects found.',
+            ),
+            'no_matching' => array(
+                'zh' => '没有找到符合条件的项目。',
+                'en' => 'No matching projects found.',
+            ),
+            'processing_period' => array(
+                'zh' => '办理周期：',
+                'en' => 'Processing Period: ',
+            ),
+            'identity_type' => array(
+                'zh' => '身份类型：',
+                'en' => 'Identity Type: ',
+            ),
+            'investment_amount' => array(
+                'zh' => '投资金额：',
+                'en' => 'Investment Amount: ',
+            ),
+            'residential_req' => array(
+                'zh' => '居住要求：',
+                'en' => 'Residential Requirements: ',
+            ),
+            'language_req' => array(
+                'zh' => '语言要求：',
+                'en' => 'Language Requirements: ',
+            ),
+            'inquire_price' => array(
+                'zh' => '咨询价格',
+                'en' => 'Inquire Price',
+            ),
+        );
+
+        if (isset($translations[$key][$language])) {
+            return $translations[$key][$language];
+        }
+
+        // Fallback to Chinese
+        return isset($translations[$key]['zh']) ? $translations[$key]['zh'] : $key;
     }
 
     /**
@@ -171,7 +240,7 @@ class Shaw_Immigration_Projects
             'description' => __('Immigration Projects and Programs', 'shaw-immigration-projects'),
             'labels' => $labels,
             'supports' => array('title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields'),
-            'taxonomies' => array('project_country', 'project_category'),
+            'taxonomies' => array('project_country', 'project_category', 'project_type'),
             'hierarchical' => false,
             'public' => true,
             'show_ui' => true,
@@ -269,6 +338,42 @@ class Shaw_Immigration_Projects
         );
 
         register_taxonomy('project_category', array('immigration_project'), $category_args);
+
+        // Register Type Taxonomy
+        $type_labels = array(
+            'name' => _x('Project Types', 'Taxonomy General Name', 'shaw-immigration-projects'),
+            'singular_name' => _x('Project Type', 'Taxonomy Singular Name', 'shaw-immigration-projects'),
+            'menu_name' => __('Types', 'shaw-immigration-projects'),
+            'all_items' => __('All Types', 'shaw-immigration-projects'),
+            'parent_item' => __('Parent Type', 'shaw-immigration-projects'),
+            'parent_item_colon' => __('Parent Type:', 'shaw-immigration-projects'),
+            'new_item_name' => __('New Type Name', 'shaw-immigration-projects'),
+            'add_new_item' => __('Add New Type', 'shaw-immigration-projects'),
+            'edit_item' => __('Edit Type', 'shaw-immigration-projects'),
+            'update_item' => __('Update Type', 'shaw-immigration-projects'),
+            'view_item' => __('View Type', 'shaw-immigration-projects'),
+            'separate_items_with_commas' => __('Separate types with commas', 'shaw-immigration-projects'),
+            'add_or_remove_items' => __('Add or remove types', 'shaw-immigration-projects'),
+            'choose_from_most_used' => __('Choose from the most used', 'shaw-immigration-projects'),
+            'popular_items' => __('Popular Types', 'shaw-immigration-projects'),
+            'search_items' => __('Search Types', 'shaw-immigration-projects'),
+            'not_found' => __('Not Found', 'shaw-immigration-projects'),
+        );
+
+        $type_args = array(
+            'labels' => $type_labels,
+            'hierarchical' => true,
+            'public' => true,
+            'show_ui' => true,
+            'show_admin_column' => true,
+            'show_in_nav_menus' => true,
+            'show_tagcloud' => true,
+            'show_in_rest' => true,
+            'rest_base' => 'project-types',
+            'rewrite' => array('slug' => 'project-type'),
+        );
+
+        register_taxonomy('project_type', array('immigration_project'), $type_args);
     }
 
     /**
@@ -464,8 +569,16 @@ class Shaw_Immigration_Projects
      */
     public function get_filtered_projects($request)
     {
+        // Decode URL-encoded slugs to support Chinese characters
         $country = $request->get_param('country');
+        $country = $country ? urldecode($country) : null;
+
         $category = $request->get_param('category');
+        $category = $category ? urldecode($category) : null;
+
+        $type = $request->get_param('type');
+        $type = $type ? urldecode($type) : null;
+
         $posts_per_page = $request->get_param('per_page') ? intval($request->get_param('per_page')) : 9;
         $paged = $request->get_param('page') ? intval($request->get_param('page')) : 1;
 
@@ -494,6 +607,14 @@ class Shaw_Immigration_Projects
             );
         }
 
+        if ($type && $type !== 'all') {
+            $tax_query[] = array(
+                'taxonomy' => 'project_type',
+                'field' => 'slug',
+                'terms' => $type,
+            );
+        }
+
         if (count($tax_query) > 1) {
             $args['tax_query'] = $tax_query;
         }
@@ -519,6 +640,7 @@ class Shaw_Immigration_Projects
                     'identity_type' => get_field('identity_type', $post_id),
                     'countries' => wp_get_post_terms($post_id, 'project_country', array('fields' => 'names')),
                     'categories' => wp_get_post_terms($post_id, 'project_category', array('fields' => 'names')),
+                    'types' => wp_get_post_terms($post_id, 'project_type', array('fields' => 'names')),
                 );
             }
         }
@@ -548,6 +670,11 @@ class Shaw_Immigration_Projects
             'hide_empty' => true,
         ));
 
+        $types = get_terms(array(
+            'taxonomy' => 'project_type',
+            'hide_empty' => true,
+        ));
+
         $country_options = array();
         foreach ($countries as $country) {
             $country_options[] = array(
@@ -566,9 +693,19 @@ class Shaw_Immigration_Projects
             );
         }
 
+        $type_options = array();
+        foreach ($types as $type) {
+            $type_options[] = array(
+                'slug' => $type->slug,
+                'name' => $type->name,
+                'count' => $type->count,
+            );
+        }
+
         return new WP_REST_Response(array(
             'countries' => $country_options,
             'categories' => $category_options,
+            'types' => $type_options,
         ), 200);
     }
 
@@ -577,7 +714,7 @@ class Shaw_Immigration_Projects
      */
     public function enqueue_scripts()
     {
-        if (is_post_type_archive('immigration_project') || is_singular('immigration_project') || is_tax(array('project_country', 'project_category'))) {
+        if (is_post_type_archive('immigration_project') || is_singular('immigration_project') || is_tax(array('project_country', 'project_category', 'project_type'))) {
             // Main listing styles
             wp_enqueue_style(
                 'shaw-immigration-projects',
@@ -912,6 +1049,17 @@ class Shaw_Immigration_Projects
      */
     public function add_debug_menu()
     {
+        // Settings page
+        add_submenu_page(
+            'edit.php?post_type=immigration_project',
+            __('Settings', 'shaw-immigration-projects'),
+            __('Settings', 'shaw-immigration-projects'),
+            'manage_options',
+            'shaw-immigration-settings',
+            array($this, 'render_settings_page')
+        );
+
+        // Debug page
         add_submenu_page(
             'edit.php?post_type=immigration_project',
             'Template Debug Info',
@@ -920,6 +1068,42 @@ class Shaw_Immigration_Projects
             'shaw-immigration-debug',
             array($this, 'render_debug_page')
         );
+    }
+
+    /**
+     * Render settings page
+     */
+    public function render_settings_page()
+    {
+        $current_language = get_option('shaw_immigration_language', 'zh');
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Shaw Immigration Projects Settings', 'shaw-immigration-projects'); ?></h1>
+            <form method="post" action="options.php">
+                <?php settings_fields('shaw_immigration_settings'); ?>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><?php _e('Display Language', 'shaw-immigration-projects'); ?></th>
+                        <td>
+                            <fieldset>
+                                <label>
+                                    <input type="radio" name="shaw_immigration_language" value="zh" <?php checked($current_language, 'zh'); ?> />
+                                    中文 (Chinese)
+                                </label>
+                                <br />
+                                <label>
+                                    <input type="radio" name="shaw_immigration_language" value="en" <?php checked($current_language, 'en'); ?> />
+                                    English
+                                </label>
+                            </fieldset>
+                            <p class="description"><?php _e('Select the language for frontend display text.', 'shaw-immigration-projects'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                <?php submit_button(); ?>
+            </form>
+        </div>
+        <?php
     }
 
     /**

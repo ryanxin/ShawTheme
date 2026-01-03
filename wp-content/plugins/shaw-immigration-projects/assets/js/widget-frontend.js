@@ -4,7 +4,7 @@
  * Handles AJAX filtering and pagination for the immigration projects widget
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
     class ShawImmigrationWidget {
@@ -23,10 +23,12 @@
             // Current filter state - initialize from DOM (server-rendered state)
             const $activeCountry = this.$widget.find('.shaw-country-filter .shaw-filter-tab.active');
             const $activeCategory = this.$widget.find('.shaw-category-filter .shaw-filter-tab.active');
+            const $activeType = this.$widget.find('.shaw-type-filter .shaw-filter-tab.active');
 
             this.filters = {
                 country: $activeCountry.length ? $activeCountry.data('filter-value') : 'all',
                 category: $activeCategory.length ? $activeCategory.data('filter-value') : 'all',
+                type: $activeType.length ? $activeType.data('filter-value') : 'all',
                 paged: 1
             };
 
@@ -74,6 +76,8 @@
                 this.filters.country = filterValue;
             } else if (filterType === 'category') {
                 this.filters.category = filterValue;
+            } else if (filterType === 'type') {
+                this.filters.type = filterValue;
             }
 
             // Reset to page 1 when filter changes
@@ -107,6 +111,7 @@
                 nonce: shawImmigrationWidget.nonce,
                 country: this.filters.country,
                 category: this.filters.category,
+                type: this.filters.type,
                 template_id: this.templateId,
                 posts_per_page: this.postsPerPage,
                 paged: this.filters.paged
@@ -243,7 +248,7 @@
             // Simple fade in animation
             $items.css('opacity', '0');
 
-            $items.each(function(index) {
+            $items.each(function (index) {
                 $(this).delay(index * 50).fadeTo(300, 1);
             });
         }
@@ -258,9 +263,9 @@
     }
 
     // Initialize widgets on page load
-    $(window).on('elementor/frontend/init', function() {
+    $(window).on('elementor/frontend/init', function () {
         // For Elementor frontend
-        elementorFrontend.hooks.addAction('frontend/element_ready/shaw_immigration_projects.default', function($scope) {
+        elementorFrontend.hooks.addAction('frontend/element_ready/shaw_immigration_projects.default', function ($scope) {
             const $widget = $scope.find('.shaw-immigration-widget');
             if ($widget.length) {
                 new ShawImmigrationWidget($widget[0]);
@@ -269,8 +274,8 @@
     });
 
     // Also initialize on regular DOM ready (for non-Elementor pages)
-    $(document).ready(function() {
-        $('.shaw-immigration-widget').each(function() {
+    $(document).ready(function () {
+        $('.shaw-immigration-widget').each(function () {
             // Check if not already initialized (avoid double init in Elementor)
             if (!$(this).data('shaw-initialized')) {
                 new ShawImmigrationWidget(this);

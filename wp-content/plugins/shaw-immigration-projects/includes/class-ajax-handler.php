@@ -9,12 +9,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Shaw_Immigration_AJAX_Handler {
+class Shaw_Immigration_AJAX_Handler
+{
 
     /**
      * Initialize AJAX handlers
      */
-    public static function init() {
+    public static function init()
+    {
         // For logged-in users
         add_action('wp_ajax_shaw_load_projects', [__CLASS__, 'load_projects']);
 
@@ -25,13 +27,15 @@ class Shaw_Immigration_AJAX_Handler {
     /**
      * Load projects via AJAX
      */
-    public static function load_projects() {
+    public static function load_projects()
+    {
         // Verify nonce for security
         check_ajax_referer('shaw_immigration_nonce', 'nonce');
 
-        // Get parameters
-        $country = isset($_POST['country']) ? sanitize_text_field($_POST['country']) : 'all';
-        $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : 'all';
+        // Get parameters and decode URL-encoded slugs (for Chinese characters)
+        $country = isset($_POST['country']) ? sanitize_text_field(urldecode($_POST['country'])) : 'all';
+        $category = isset($_POST['category']) ? sanitize_text_field(urldecode($_POST['category'])) : 'all';
+        $type = isset($_POST['type']) ? sanitize_text_field(urldecode($_POST['type'])) : 'all';
         $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
         $posts_per_page = isset($_POST['posts_per_page']) ? intval($_POST['posts_per_page']) : 9;
         $paged = isset($_POST['paged']) ? intval($_POST['paged']) : 1;
@@ -44,6 +48,7 @@ class Shaw_Immigration_AJAX_Handler {
             'paged' => $paged,
             'country' => $country,
             'category' => $category,
+            'type' => $type,
         ];
 
         // Get projects
@@ -92,7 +97,8 @@ class Shaw_Immigration_AJAX_Handler {
      * @param array $args Query arguments
      * @return array
      */
-    public static function get_initial_projects($args = []) {
+    public static function get_initial_projects($args = [])
+    {
         $defaults = [
             'posts_per_page' => 9,
             'template_id' => 0,

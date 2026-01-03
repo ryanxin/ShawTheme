@@ -297,7 +297,7 @@ class Shaw_Events_Widget extends \Elementor\Widget_Base
           </div>
 
           <?php if ($is_expired): ?>
-            <div class="shaw-event-expired-badge">Expired</div>
+            <div class="shaw-event-expired-badge"><?php echo esc_html(Shaw_Events::get_text('expired')); ?></div>
           <?php endif; ?>
         </div>
 
@@ -335,7 +335,7 @@ class Shaw_Events_Widget extends \Elementor\Widget_Base
 
             <?php if ($speaker): ?>
               <div class="shaw-event-speaker">
-                <strong>Speaker:</strong> <?php echo esc_html($speaker); ?>
+                <strong><?php echo esc_html(Shaw_Events::get_text('speaker')); ?></strong> <?php echo esc_html($speaker); ?>
               </div>
             <?php endif; ?>
           </div>
@@ -347,7 +347,7 @@ class Shaw_Events_Widget extends \Elementor\Widget_Base
                target="_blank"
                rel="noopener noreferrer"
                onclick="event.stopPropagation();">
-              SIGN UP
+              <?php echo esc_html(Shaw_Events::get_text('sign_up')); ?>
             </a>
           <?php endif; ?>
         </div>
@@ -379,7 +379,7 @@ class Shaw_Events_Widget extends \Elementor\Widget_Base
         </div>
       <?php else: ?>
         <div class="shaw-events-empty">
-          <p><?php _e('No upcoming events.', 'shaw-events'); ?></p>
+          <p><?php echo esc_html(Shaw_Events::get_text('no_events')); ?></p>
         </div>
       <?php endif; ?>
 

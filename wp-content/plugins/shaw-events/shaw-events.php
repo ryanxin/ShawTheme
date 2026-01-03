@@ -3,7 +3,7 @@
  * Plugin Name: Shaw Events
  * Plugin URI: https://shawglobal.com
  * Description: Custom Post Type for Events with Elementor widget support, date-based sorting, and automatic expiry
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Shaw Global
  * Author URI: https://shawglobal.com
  * Text Domain: shaw-events
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('SHAW_EVENTS_VERSION', '1.0.1');
+define('SHAW_EVENTS_VERSION', '1.0.2');
 define('SHAW_EVENTS_PATH', plugin_dir_path(__FILE__));
 define('SHAW_EVENTS_URL', plugin_dir_url(__FILE__));
 
@@ -52,6 +52,107 @@ class Shaw_Events
     // Register Elementor Widget
     add_action('elementor/widgets/register', array($this, 'register_elementor_widgets'));
     add_action('elementor/frontend/after_enqueue_scripts', array($this, 'enqueue_widget_scripts'));
+
+    // Admin settings
+    add_action('admin_menu', array($this, 'add_settings_menu'));
+    add_action('admin_init', array($this, 'register_settings'));
+  }
+
+  /**
+   * Add settings submenu
+   */
+  public function add_settings_menu()
+  {
+    add_submenu_page(
+      'edit.php?post_type=shaw_event',
+      __('Settings', 'shaw-events'),
+      __('Settings', 'shaw-events'),
+      'manage_options',
+      'shaw-events-settings',
+      array($this, 'render_settings_page')
+    );
+  }
+
+  /**
+   * Register settings
+   */
+  public function register_settings()
+  {
+    register_setting('shaw_events_settings', 'shaw_events_language', array(
+      'type' => 'string',
+      'default' => 'zh',
+      'sanitize_callback' => 'sanitize_text_field',
+    ));
+  }
+
+  /**
+   * Render settings page
+   */
+  public function render_settings_page()
+  {
+    $current_language = get_option('shaw_events_language', 'zh');
+    ?>
+    <div class="wrap">
+      <h1><?php _e('Shaw Events Settings', 'shaw-events'); ?></h1>
+      <form method="post" action="options.php">
+        <?php settings_fields('shaw_events_settings'); ?>
+        <table class="form-table">
+          <tr>
+            <th scope="row"><?php _e('Display Language', 'shaw-events'); ?></th>
+            <td>
+              <fieldset>
+                <label>
+                  <input type="radio" name="shaw_events_language" value="zh" <?php checked($current_language, 'zh'); ?> />
+                  中文 (Chinese)
+                </label>
+                <br />
+                <label>
+                  <input type="radio" name="shaw_events_language" value="en" <?php checked($current_language, 'en'); ?> />
+                  English
+                </label>
+              </fieldset>
+              <p class="description"><?php _e('Select the language for frontend display text.', 'shaw-events'); ?></p>
+            </td>
+          </tr>
+        </table>
+        <?php submit_button(); ?>
+      </form>
+    </div>
+    <?php
+  }
+
+  /**
+   * Get translated text
+   */
+  public static function get_text($key)
+  {
+    $language = get_option('shaw_events_language', 'zh');
+
+    $translations = array(
+      'expired' => array(
+        'zh' => '已过期',
+        'en' => 'Expired',
+      ),
+      'speaker' => array(
+        'zh' => '讲师：',
+        'en' => 'Speaker: ',
+      ),
+      'sign_up' => array(
+        'zh' => '立即报名',
+        'en' => 'SIGN UP',
+      ),
+      'no_events' => array(
+        'zh' => '暂无活动。',
+        'en' => 'No upcoming events.',
+      ),
+    );
+
+    if (isset($translations[$key][$language])) {
+      return $translations[$key][$language];
+    }
+
+    // Fallback to Chinese
+    return isset($translations[$key]['zh']) ? $translations[$key]['zh'] : $key;
   }
 
   /**

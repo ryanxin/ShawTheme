@@ -134,6 +134,21 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
             ]
         );
 
+        $this->add_control(
+            'show_type_filter',
+            [
+                'label' => __('Show Type Filter', 'shaw-immigration-projects'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'shaw-immigration-projects'),
+                'label_off' => __('No', 'shaw-immigration-projects'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+                'condition' => [
+                    'show_filters' => 'yes',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
 
         // Style Section - Filters
@@ -292,16 +307,23 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
             'hide_empty' => true,
         ]);
 
+        $types = get_terms([
+            'taxonomy' => 'project_type',
+            'hide_empty' => true,
+        ]);
+
         // Get initial projects (server-side render for better SEO and initial load)
-        // Check for URL parameters for deep linking
-        $active_country = isset($_GET['project_country']) ? sanitize_text_field($_GET['project_country']) : 'all';
-        $active_category = isset($_GET['project_category']) ? sanitize_text_field($_GET['project_category']) : 'all';
+        // Check for URL parameters for deep linking and decode Chinese characters
+        $active_country = isset($_GET['project_country']) ? sanitize_text_field(urldecode($_GET['project_country'])) : 'all';
+        $active_category = isset($_GET['project_category']) ? sanitize_text_field(urldecode($_GET['project_category'])) : 'all';
+        $active_type = isset($_GET['project_type']) ? sanitize_text_field(urldecode($_GET['project_type'])) : 'all';
 
         $initial_data = Shaw_Immigration_AJAX_Handler::get_initial_projects([
             'posts_per_page' => $settings['posts_per_page'],
             'template_id' => $settings['loop_template'],
             'country' => $active_country,
             'category' => $active_category,
+            'type' => $active_type,
         ]);
 
         ?>
@@ -315,12 +337,29 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
                 <!-- Filters Section -->
                 <div class="shaw-filters-wrapper">
 
+                    <?php if ($settings['show_type_filter'] === 'yes' && !empty($types)): ?>
+                        <!-- Type Filter -->
+                        <div class="shaw-filter-section shaw-type-filter">
+                            <div class="shaw-filter-tabs">
+                                <div class="shaw-filter-tab <?php echo ($active_type === 'all') ? 'active' : ''; ?>" data-filter-type="type" data-filter-value="all">
+                                    <?php echo esc_html(Shaw_Immigration_Projects::get_text('all')); ?>
+                                </div>
+                                <?php foreach ($types as $type): ?>
+                                    <div class="shaw-filter-tab <?php echo ($active_type === $type->slug) ? 'active' : ''; ?>" data-filter-type="type" data-filter-value="<?php echo esc_attr($type->slug); ?>">
+                                        <?php echo esc_html($type->name); ?>
+                                        <span class="count">(<?php echo $type->count; ?>)</span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if ($settings['show_country_filter'] === 'yes' && !empty($countries)): ?>
                         <!-- Country Filter -->
                         <div class="shaw-filter-section shaw-country-filter">
                             <div class="shaw-filter-tabs">
                                 <div class="shaw-filter-tab <?php echo ($active_country === 'all') ? 'active' : ''; ?>" data-filter-type="country" data-filter-value="all">
-                                    全部
+                                    <?php echo esc_html(Shaw_Immigration_Projects::get_text('all')); ?>
                                 </div>
                                 <?php foreach ($countries as $country): ?>
                                     <div class="shaw-filter-tab <?php echo ($active_country === $country->slug) ? 'active' : ''; ?>" data-filter-type="country" data-filter-value="<?php echo esc_attr($country->slug); ?>">
@@ -337,7 +376,7 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
                         <div class="shaw-filter-section shaw-category-filter">
                             <div class="shaw-filter-tabs">
                                 <div class="shaw-filter-tab <?php echo ($active_category === 'all') ? 'active' : ''; ?>" data-filter-type="category" data-filter-value="all">
-                                    全部
+                                    <?php echo esc_html(Shaw_Immigration_Projects::get_text('all')); ?>
                                 </div>
                                 <?php foreach ($categories as $category): ?>
                                     <div class="shaw-filter-tab <?php echo ($active_category === $category->slug) ? 'active' : ''; ?>" data-filter-type="category" data-filter-value="<?php echo esc_attr($category->slug); ?>">
@@ -364,7 +403,7 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
                 if (!empty($initial_data['html'])) {
                     echo $initial_data['html'];
                 } else {
-                    echo '<div class="shaw-no-results"><p>没有找到项目。</p></div>';
+                    echo '<div class="shaw-no-results"><p>' . esc_html(Shaw_Immigration_Projects::get_text('no_projects')) . '</p></div>';
                 }
                 ?>
             </div>
@@ -376,7 +415,7 @@ class Shaw_Immigration_Projects_Widget extends \Elementor\Widget_Base
 
             <!-- No Results Message -->
             <div class="shaw-no-results" style="display: none;">
-                <p>没有找到符合条件的项目。</p>
+                <p><?php echo esc_html(Shaw_Immigration_Projects::get_text('no_matching')); ?></p>
             </div>
 
         </div>

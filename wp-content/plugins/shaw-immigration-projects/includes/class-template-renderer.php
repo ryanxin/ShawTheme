@@ -167,7 +167,7 @@ class Shaw_Immigration_Template_Renderer
                 <div class="shaw-project-info">
                     <?php if ($processing_period): ?>
                         <div class="shaw-info-item">
-                            <span class="shaw-info-label">办理周期：</span>
+                            <span class="shaw-info-label"><?php echo esc_html(Shaw_Immigration_Projects::get_text('processing_period')); ?></span>
                             <span class="shaw-info-value">
                                 <?php if ($processing_period_link): ?>
                                     <a href="<?php echo esc_url($processing_period_link); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($processing_period); ?></a>
@@ -180,28 +180,28 @@ class Shaw_Immigration_Template_Renderer
 
                     <?php if ($identity_type): ?>
                         <div class="shaw-info-item">
-                            <span class="shaw-info-label">身份类型：</span>
+                            <span class="shaw-info-label"><?php echo esc_html(Shaw_Immigration_Projects::get_text('identity_type')); ?></span>
                             <span class="shaw-info-value"><?php echo esc_html($identity_type); ?></span>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($investment_amount): ?>
                         <div class="shaw-info-item">
-                            <span class="shaw-info-label">投资金额：</span>
+                            <span class="shaw-info-label"><?php echo esc_html(Shaw_Immigration_Projects::get_text('investment_amount')); ?></span>
                             <span class="shaw-info-value"><?php echo esc_html($investment_amount); ?></span>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($residential_requirements): ?>
                         <div class="shaw-info-item">
-                            <span class="shaw-info-label">居住要求：</span>
+                            <span class="shaw-info-label"><?php echo esc_html(Shaw_Immigration_Projects::get_text('residential_req')); ?></span>
                             <span class="shaw-info-value"><?php echo esc_html($residential_requirements); ?></span>
                         </div>
                     <?php endif; ?>
 
                     <?php if ($language): ?>
                         <div class="shaw-info-item">
-                            <span class="shaw-info-label">语言要求：</span>
+                            <span class="shaw-info-label"><?php echo esc_html(Shaw_Immigration_Projects::get_text('language_req')); ?></span>
                             <span class="shaw-info-value"><?php echo esc_html($language); ?></span>
                         </div>
                     <?php endif; ?>
@@ -209,7 +209,7 @@ class Shaw_Immigration_Template_Renderer
 
                 <div class="shaw-project-footer">
                     <a href="<?php echo esc_url($permalink); ?>" class="shaw-project-btn">
-                        咨询价格
+                        <?php echo esc_html(Shaw_Immigration_Projects::get_text('inquire_price')); ?>
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M8 1l7 7-7 7M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
@@ -280,6 +280,14 @@ class Shaw_Immigration_Template_Renderer
             ];
         }
 
+        if (!empty($args['type']) && $args['type'] !== 'all') {
+            $tax_query[] = [
+                'taxonomy' => 'project_type',
+                'field' => 'slug',
+                'terms' => $args['type'],
+            ];
+        }
+
         if (count($tax_query) > 1) {
             $args['tax_query'] = $tax_query;
         }
@@ -287,6 +295,7 @@ class Shaw_Immigration_Template_Renderer
         // Remove custom args
         unset($args['country']);
         unset($args['category']);
+        unset($args['type']);
 
         return new WP_Query($args);
     }

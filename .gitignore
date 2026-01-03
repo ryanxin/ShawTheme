@@ -19,6 +19,7 @@
 # 仅跟踪指定插件目录（将 your-plugin-slug 改成你的插件目录名，可复制多行保留多个）
 /wp-content/plugins/*
 !/wp-content/plugins/shaw-immigration-projects/
+!/wp-content/plugins/shaw-events/
 
 # 仅跟踪指定主题目录（将 your-theme-slug 改成你的主题目录名，可复制多行保留多个）
 /wp-content/themes/*
