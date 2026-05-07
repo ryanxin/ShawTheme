@@ -20,6 +20,9 @@
 /wp-content/plugins/*
 !/wp-content/plugins/shaw-immigration-projects/
 !/wp-content/plugins/shaw-events/
+!/wp-content/plugins/shaw-education-programs/
+!/wp-content/plugins/shaw-education-services/
+
 
 # 仅跟踪指定主题目录（将 your-theme-slug 改成你的主题目录名，可复制多行保留多个）
 /wp-content/themes/*

@@ -1,0 +1,189 @@
+/**
+ * Shaw Education Services - Loop widget styles
+ */
+
+.shaw-service-loop {
+    --shaw-service-accent: #ed2b2f;
+    --shaw-service-accent-soft: rgba(237, 43, 47, 0.12);
+    --shaw-service-accent-alt: #29a9e1;
+    --shaw-service-text: #1d252c;
+    --shaw-service-muted: #66717b;
+}
+
+.shaw-service-loop--blue {
+    --shaw-service-accent: #29a9e1;
+    --shaw-service-accent-soft: rgba(41, 169, 225, 0.12);
+}
+
+.shaw-service-loop-empty {
+    color: #66717b;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.shaw-service-scope-grid,
+.shaw-service-audience-grid,
+.shaw-service-process-grid,
+.shaw-service-compliance-grid {
+    display: grid;
+    gap: 32px;
+}
+
+.shaw-service-scope-grid[data-columns="2"],
+.shaw-service-compliance-grid[data-columns="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shaw-service-scope-grid[data-columns="3"],
+.shaw-service-compliance-grid[data-columns="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shaw-service-audience-grid[data-columns="3"],
+.shaw-service-process-grid[data-columns="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shaw-service-audience-grid[data-columns="4"],
+.shaw-service-process-grid[data-columns="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.shaw-service-scope-card {
+    background: #fff;
+    border-top: 3px solid var(--shaw-service-accent);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 320px;
+}
+
+.shaw-service-loop--alternate .shaw-service-scope-card:nth-child(even),
+.shaw-service-loop--alternate .shaw-service-compliance-item:nth-child(even),
+.shaw-service-loop--alternate .shaw-service-process-item:nth-child(even) {
+    --shaw-service-accent: var(--shaw-service-accent-alt);
+    --shaw-service-accent-soft: rgba(41, 169, 225, 0.12);
+}
+
+.shaw-service-scope-card-media {
+    min-height: 180px;
+}
+
+.shaw-service-scope-card-media img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.shaw-service-scope-card-body {
+    padding: 26px 24px 24px;
+}
+
+.shaw-service-scope-card-title,
+.shaw-service-process-title {
+    color: var(--shaw-service-text);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.18;
+    margin: 0 0 14px;
+}
+
+.shaw-service-scope-card-text,
+.shaw-service-process-text,
+.shaw-service-compliance-text,
+.shaw-service-audience-text {
+    color: var(--shaw-service-muted);
+    font-size: 15px;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.shaw-service-audience-item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    text-align: center;
+}
+
+.shaw-service-audience-media {
+    aspect-ratio: 1 / 1;
+    border-radius: 999px;
+    overflow: hidden;
+    width: min(160px, 100%);
+}
+
+.shaw-service-audience-media img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.shaw-service-process-item {
+    min-height: 210px;
+    padding-top: 22px;
+    position: relative;
+}
+
+.shaw-service-process-number {
+    color: var(--shaw-service-accent-soft);
+    font-size: 96px;
+    font-weight: 700;
+    left: 0;
+    line-height: 0.85;
+    position: absolute;
+    top: 0;
+    z-index: 0;
+}
+
+.shaw-service-process-title,
+.shaw-service-process-text {
+    position: relative;
+    z-index: 1;
+}
+
+.shaw-service-process-title {
+    font-size: 30px;
+    margin-top: 46px;
+    text-transform: uppercase;
+}
+
+.shaw-service-compliance-item {
+    background: #fff;
+    border-left: 2px solid var(--shaw-service-accent);
+    padding: 22px 22px 22px 18px;
+}
+
+@media (max-width: 1024px) {
+    .shaw-service-scope-grid,
+    .shaw-service-audience-grid,
+    .shaw-service-process-grid,
+    .shaw-service-compliance-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .shaw-service-scope-grid,
+    .shaw-service-audience-grid,
+    .shaw-service-process-grid,
+    .shaw-service-compliance-grid {
+        gap: 22px;
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+
+    .shaw-service-scope-card-title,
+    .shaw-service-process-title {
+        font-size: 24px;
+    }
+
+    .shaw-service-process-number {
+        font-size: 72px;
+    }
+
+    .shaw-service-process-title {
+        margin-top: 36px;
+    }
+}

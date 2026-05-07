@@ -1,8 +1,8 @@
 <?php
 /**
- * ShawGlobal Theme Functions
- * 
- * @package ShawGlobal
+ * ShawsEdu Theme Functions
+ *
+ * @package ShawsEdu
  */
 
 if (!defined('ABSPATH')) {
@@ -12,11 +12,18 @@ if (!defined('ABSPATH')) {
 /**
  * 定义主题路径常量
  */
-define('SHAWGLOBAL_THEME_VERSION', '1.0.1');
-define('SHAWGLOBAL_THEME_PATH', get_stylesheet_directory());
-define('SHAWGLOBAL_THEME_URL', get_stylesheet_directory_uri());
-define('SHAWGLOBAL_THEME_ASSETS_PATH', SHAWGLOBAL_THEME_PATH . '/assets/');
-define('SHAWGLOBAL_THEME_ASSETS_URL', SHAWGLOBAL_THEME_URL . '/assets/');
+define('SHAWSEDU_THEME_VERSION', '1.1.0');
+define('SHAWSEDU_THEME_PATH', get_stylesheet_directory());
+define('SHAWSEDU_THEME_URL', get_stylesheet_directory_uri());
+define('SHAWSEDU_THEME_ASSETS_PATH', SHAWSEDU_THEME_PATH . '/assets/');
+define('SHAWSEDU_THEME_ASSETS_URL', SHAWSEDU_THEME_URL . '/assets/');
+
+// Backward-compatible aliases for older snippets in this child theme.
+defined('SHAWGLOBAL_THEME_VERSION') || define('SHAWGLOBAL_THEME_VERSION', SHAWSEDU_THEME_VERSION);
+defined('SHAWGLOBAL_THEME_PATH') || define('SHAWGLOBAL_THEME_PATH', SHAWSEDU_THEME_PATH);
+defined('SHAWGLOBAL_THEME_URL') || define('SHAWGLOBAL_THEME_URL', SHAWSEDU_THEME_URL);
+defined('SHAWGLOBAL_THEME_ASSETS_PATH') || define('SHAWGLOBAL_THEME_ASSETS_PATH', SHAWSEDU_THEME_ASSETS_PATH);
+defined('SHAWGLOBAL_THEME_ASSETS_URL') || define('SHAWGLOBAL_THEME_ASSETS_URL', SHAWSEDU_THEME_ASSETS_URL);
 
 /**
  * 加载父主题样式
@@ -33,10 +40,10 @@ function shawglobal_theme_enqueue_styles()
 
 	// 加载主题自定义样式
 	wp_enqueue_style(
-		'shawglobal-theme-style',
-		SHAWGLOBAL_THEME_ASSETS_URL . 'css/custom.css',
+		'shawsedu-theme-style',
+		SHAWSEDU_THEME_ASSETS_URL . 'css/custom.css',
 		array('hello-elementor-parent-style'),
-		SHAWGLOBAL_THEME_VERSION
+		SHAWSEDU_THEME_VERSION
 	);
 }
 add_action('wp_enqueue_scripts', 'shawglobal_theme_enqueue_styles');
@@ -47,10 +54,10 @@ add_action('wp_enqueue_scripts', 'shawglobal_theme_enqueue_styles');
 function shawglobal_theme_enqueue_scripts()
 {
 	wp_enqueue_script(
-		'shawglobal-theme-script',
-		SHAWGLOBAL_THEME_ASSETS_URL . 'js/custom.js',
+		'shawsedu-theme-script',
+		SHAWSEDU_THEME_ASSETS_URL . 'js/custom.js',
 		array('jquery'),
-		SHAWGLOBAL_THEME_VERSION,
+		SHAWSEDU_THEME_VERSION,
 		true
 	);
 }
@@ -114,8 +121,8 @@ function shawglobal_theme_register_widgets($widgets_manager)
 function shawglobal_theme_register_menus()
 {
 	register_nav_menus(array(
-		'header-menu' => __('头部菜单', 'shawglobal'),
-		'footer-menu' => __('底部菜单', 'shawglobal'),
+		'header-menu' => __('头部菜单', 'shawsedu'),
+		'footer-menu' => __('底部菜单', 'shawsedu'),
 	));
 }
 add_action('after_setup_theme', 'shawglobal_theme_register_menus');
@@ -155,4 +162,3 @@ function shawglobal_customize_rankmath_breadcrumb($crumbs, $class)
 	return $crumbs;
 }
 add_filter('rank_math/frontend/breadcrumb/items', 'shawglobal_customize_rankmath_breadcrumb', 10, 2);
-

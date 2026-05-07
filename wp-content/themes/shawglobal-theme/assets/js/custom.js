@@ -1,6 +1,6 @@
 /**
- * ShawGlobal Theme - 自定义 JavaScript
- * 
+ * ShawsEdu Theme - 自定义 JavaScript
+ *
  * 这个文件包含所有自定义交互脚本
  */
 
@@ -129,4 +129,3 @@
 	}
 
 })(jQuery);
-

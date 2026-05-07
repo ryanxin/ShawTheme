@@ -1,6 +1,6 @@
-# ShawGlobal Theme
+# ShawsEdu Theme
 
-Shaw Global 移民项目网站主题 - 基于 Hello Elementor 的子主题
+ShawsEdu 教育咨询网站主题 - 基于 Hello Elementor 的子主题
 
 ## 目录结构
 
@@ -86,9 +86,9 @@ function auto_import_elementor_template($template_name, $json_file_path) {
 - 所有自定义脚本放在 `assets/js/custom.js`
 - Elementor 模板 JSON 文件放在 `templates/` 目录
 - 保持与父主题的兼容性
+- 主题层颜色和字体 token 应与 Elementor v4 Variables Manager 保持一致
 
 ## 参考文档
 
 - [Elementor Theme Builder 文档](https://elementor.com/help/theme-builder/)
 - [Hello Elementor 主题文档](https://elementor.com/hello-theme/)
-

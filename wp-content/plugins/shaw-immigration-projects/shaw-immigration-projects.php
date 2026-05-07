@@ -3,7 +3,7 @@
  * Plugin Name: Shaw Immigration Projects
  * Plugin URI: https://shawglobal.com
  * Description: Custom Post Type for Immigration Projects with Country, Category and Type taxonomies, AJAX filtering support
- * Version: 1.2.2
+ * Version: 1.2.3
  * Author: Shaw Global
  * Author URI: https://shawglobal.com
  * Text Domain: shaw-immigration-projects
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('SHAW_IMMIGRATION_VERSION', '1.2.2');
+define('SHAW_IMMIGRATION_VERSION', '1.2.3');
 define('SHAW_IMMIGRATION_PATH', plugin_dir_path(__FILE__));
 define('SHAW_IMMIGRATION_URL', plugin_dir_url(__FILE__));
 
@@ -1473,24 +1473,99 @@ class Shaw_Immigration_Projects
 
         $output .= '</div>';
 
-        // Add CSS
+        // Add CSS with proper scoping
         if ($css) {
             $output .= '<style type="text/css">';
-            $output .= '#' . $unique_id . ' { ' . $css . ' }';
+            // Scope CSS by prefixing selectors with the unique container ID
+            $scoped_css = $this->scope_css($css, '#' . $unique_id);
+            $output .= $scoped_css;
             $output .= '</style>';
         }
 
-        // Add JavaScript
+        // Add JavaScript - NO closure wrapper so user functions stay in global scope
         if ($js) {
             $output .= '<script type="text/javascript">';
-            $output .= '(function($) {';
-            $output .= 'var calculatorContainer = document.getElementById("' . $unique_id . '");';
-            $output .= $js;
-            $output .= '})(jQuery);';
+
+            // Provide reference to the calculator container as a global variable
+            $output .= 'var calculatorContainer_' . $calculator_id . ' = document.getElementById("' . $unique_id . '");';
+
+            $processed_js = $js;
+
+            // Handle DOMContentLoaded - ensure it runs even if DOM is already loaded
+            // This is important because WordPress might load the calculator dynamically
+            $processed_js = preg_replace(
+                '/document\.addEventListener\s*\(\s*[\'"]DOMContentLoaded[\'"]\s*,\s*([^)]+)\s*\)\s*;?/',
+                'if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", $1); } else { ($1)(); }',
+                $processed_js
+            );
+
+            // Output user's JavaScript directly (functions will be in global scope)
+            $output .= $processed_js;
             $output .= '</script>';
         }
 
         return $output;
+    }
+
+    /**
+     * Scope CSS by prefixing selectors with container ID
+     * 
+     * @param string $css Original CSS code
+     * @param string $scope Scope prefix (e.g., '#shaw-calculator-123')
+     * @return string Scoped CSS
+     */
+    private function scope_css($css, $scope)
+    {
+        // Remove comments first
+        $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+
+        // Split CSS into rules
+        $rules = explode('}', $css);
+        $scoped_css = '';
+
+        foreach ($rules as $rule) {
+            $rule = trim($rule);
+            if (empty($rule)) {
+                continue;
+            }
+
+            // Split selector and declaration
+            $parts = explode('{', $rule, 2);
+            if (count($parts) !== 2) {
+                continue;
+            }
+
+            $selectors = $parts[0];
+            $declarations = $parts[1];
+
+            // Split multiple selectors
+            $selector_list = explode(',', $selectors);
+            $scoped_selectors = array();
+
+            foreach ($selector_list as $selector) {
+                $selector = trim($selector);
+                if (empty($selector)) {
+                    continue;
+                }
+
+                // Don't scope pseudo-selectors, @-rules, or already scoped selectors
+                if (
+                    strpos($selector, '@') === 0 ||
+                    strpos($selector, $scope) === 0
+                ) {
+                    $scoped_selectors[] = $selector;
+                } else {
+                    // Prefix selector with scope
+                    $scoped_selectors[] = $scope . ' ' . $selector;
+                }
+            }
+
+            if (!empty($scoped_selectors)) {
+                $scoped_css .= implode(', ', $scoped_selectors) . ' { ' . $declarations . ' }' . "\n";
+            }
+        }
+
+        return $scoped_css;
     }
 }
 

@@ -1,0 +1,333 @@
+/**
+ * Education Programs Widget - Frontend Styles
+ */
+
+.shaw-education-widget {
+    position: relative;
+    width: 100%;
+}
+
+.shaw-filters-wrapper {
+    margin-bottom: 30px;
+}
+
+.shaw-filter-section + .shaw-filter-section {
+    margin-top: 8px;
+}
+
+.shaw-filter-tabs {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 26px;
+}
+
+.shaw-filter-tab {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--shawsedu-text-muted, #707070);
+    cursor: pointer;
+    font-family: inherit;
+    margin: 0;
+    outline: none;
+    padding: 12px 0;
+    transition: color 0.24s ease, border-color 0.24s ease;
+}
+
+.shaw-filter-tabs-primary .shaw-filter-tab {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.shaw-filter-tabs-secondary .shaw-filter-tab {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.shaw-filter-tab:hover,
+.shaw-filter-tab:focus,
+.shaw-filter-tab:focus-visible,
+.shaw-filter-tab:active {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom-color: transparent;
+    box-shadow: none !important;
+    color: var(--shawsedu-text-muted, #707070);
+    outline: none;
+}
+
+.shaw-filter-tab.active,
+.shaw-filter-tab.active:hover,
+.shaw-filter-tab.active:focus,
+.shaw-filter-tab.active:focus-visible,
+.shaw-filter-tab.active:active {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-bottom-color: var(--shawsedu-ink, #1D252C);
+    box-shadow: none !important;
+    color: var(--shawsedu-ink, #1D252C);
+    outline: none;
+}
+
+.shaw-loading-overlay {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+
+.shaw-spinner {
+    animation: shaw-spin 1s linear infinite;
+    border: 4px solid #ebedf0;
+    border-radius: 50%;
+    border-top-color: var(--shawsedu-accent-red, #ED2B2F);
+    height: 44px;
+    width: 44px;
+}
+
+@keyframes shaw-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.shaw-programs-grid {
+    display: grid;
+    gap: 32px 38px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    transition: opacity 0.24s ease;
+}
+
+.shaw-programs-grid[data-columns="1"] {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.shaw-programs-grid[data-columns="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.shaw-programs-grid[data-columns="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.shaw-programs-grid[data-columns="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.shaw-program-card {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.shaw-program-image {
+    display: block;
+    height: 240px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.shaw-program-image img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    width: 100%;
+}
+
+.shaw-program-card:hover .shaw-program-image img {
+    transform: scale(1.03);
+}
+
+.shaw-program-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 22px 16px 24px;
+}
+
+.shaw-program-title {
+    color: #1A1C1B;
+    font-family: var(--e-global-typography-hero-font-family, Roboto), sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.28;
+    margin: 0 0 18px;
+}
+
+.shaw-program-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.shaw-program-description {
+    color: #333;
+    font-size: 17px;
+    line-height: 1.48;
+    margin-bottom: 18px;
+}
+
+.shaw-program-description p {
+    margin: 0;
+}
+
+.shaw-program-meta {
+    border-top: 1px solid #eceff2;
+    color: #59616a;
+    column-gap: 22px;
+    display: grid;
+    font-size: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    line-height: 1.55;
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 14px 0 0;
+    row-gap: 8px;
+}
+
+.shaw-program-meta li {
+    margin: 0;
+    padding-left: 12px;
+    position: relative;
+}
+
+.shaw-program-meta li::before {
+    background: #b8c0c8;
+    border-radius: 50%;
+    content: "";
+    height: 4px;
+    left: 0;
+    position: absolute;
+    top: 0.62em;
+    width: 4px;
+}
+
+.shaw-program-footer {
+    margin-top: auto;
+}
+
+.shaw-program-button {
+    color: #fff;
+    background: var(--shawsedu-accent-red, #ED2B2F);
+    display: inline-flex;
+    font-family: var(--e-global-typography-button-large-font-family, Parabolica), sans-serif;
+    font-size: 16px;
+    justify-content: center;
+    letter-spacing: 0.04em;
+    min-width: 190px;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color 0.24s ease, color 0.24s ease, border-color 0.24s ease;
+}
+
+.shaw-program-button:hover {
+    background: var(--shawsedu-accent-red, #b91f2b);
+    color: #fff;
+}
+
+.shaw-pagination {
+    margin-top: 48px;
+}
+
+.shaw-pagination-inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.shaw-page-link,
+.shaw-page-ellipsis {
+    color: var(--shawsedu-ink, #1D252C);
+    font-size: 16px;
+    line-height: 1;
+}
+
+.shaw-page-link {
+    border-bottom: 2px solid transparent;
+    padding: 6px 8px;
+    text-decoration: none;
+}
+
+.shaw-page-link.active,
+.shaw-page-link:hover {
+    border-bottom-color: var(--shawsedu-accent-red, #ED2B2F);
+    color: var(--shawsedu-accent-red, #ED2B2F);
+}
+
+.shaw-no-results,
+.shaw-error {
+    color: var(--shawsedu-ink, #1D252C);
+    font-size: 18px;
+    padding: 30px 0;
+}
+
+@media (max-width: 1180px) {
+    .shaw-programs-grid,
+    .shaw-programs-grid[data-columns="4"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .shaw-filters-wrapper {
+        margin-bottom: 28px;
+    }
+
+    .shaw-filter-tabs {
+        gap: 12px 18px;
+    }
+
+    .shaw-filter-tabs-primary .shaw-filter-tab {
+        font-size: 16px;
+    }
+
+    .shaw-filter-tabs-secondary .shaw-filter-tab {
+        font-size: 14px;
+    }
+
+    .shaw-programs-grid {
+        gap: 24px;
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+
+    .shaw-program-image {
+        height: 240px;
+    }
+
+    .shaw-program-title {
+        font-size: 24px;
+    }
+
+    .shaw-program-description {
+        font-size: 16px;
+    }
+
+    .shaw-program-meta {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}

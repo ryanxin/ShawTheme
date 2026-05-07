@@ -1,32 +1,60 @@
 /**
- * ShawGlobal Theme - 自定义样式
- * 
+ * ShawsEdu Theme - 自定义样式
+ *
  * 这个文件包含所有自定义 CSS 样式
  */
+
+:root {
+	--shawsedu-brand-ink: #1d252c;
+	--shawsedu-brand-accent: #ed2b2f;
+	--shawsedu-accent-light: #fcebec;
+	--shawsedu-accent-dark: #b91f2b;
+	--shawsedu-support-blue: #29a9e1;
+	--shawsedu-support-blue-light: #29a9e126;
+	--shawsedu-support-blue-dark: #0f7fb1;
+	--shawsedu-text-muted: #707070;
+	--shawsedu-text-strong: #404040;
+	--shawsedu-ink-strong: #1a1c1b;
+	--shawsedu-surface-sky: #f5f8ff;
+	--shawsedu-surface-warm: #f4f4f2;
+	--shawsedu-surface-card: #f4f6f7;
+	--shawsedu-white: #ffffff;
+	--shawsedu-white-85: rgba(255, 255, 255, 0.85);
+	--shawsedu-white-95: rgba(255, 255, 255, 0.95);
+	--shawsedu-shadow-soft: 0 2px 10px rgba(29, 37, 44, 0.1);
+	--shawsedu-shadow-card: 0 10px 30px rgba(29, 37, 44, 0.15);
+	--shawsedu-transition: all 0.3s ease;
+}
+
+body {
+	color: var(--shawsedu-text-muted);
+	background: var(--shawsedu-white);
+}
 
 /* ============================================
    透明头部 + 滚动效果
    ============================================ */
 .site-header {
-	transition: all 0.3s ease;
+	transition: var(--shawsedu-transition);
 }
 
 .site-header.scrolled {
 	backdrop-filter: blur(10px);
-	background: rgba(255, 255, 255, 0.95);
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	background: var(--shawsedu-white-95);
+	box-shadow: var(--shawsedu-shadow-soft);
 }
 
 /* ============================================
    项目卡片样式
    ============================================ */
 .project-card {
-	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+	border-color: rgba(29, 37, 44, 0.08);
 }
 
 .project-card:hover {
 	transform: translateY(-5px);
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+	box-shadow: var(--shawsedu-shadow-card);
 }
 
 /* ============================================
@@ -35,8 +63,8 @@
 .info-card {
 	border-radius: 8px;
 	padding: 20px;
-	background: #fff;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	background: var(--shawsedu-surface-card);
+	box-shadow: var(--shawsedu-shadow-soft);
 }
 
 /* ============================================
@@ -48,19 +76,19 @@
 	right: 30px;
 	width: 50px;
 	height: 50px;
-	background: #333;
-	color: #fff;
+	background: var(--shawsedu-brand-ink);
+	color: var(--shawsedu-white);
 	border-radius: 50%;
 	display: none;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	transition: all 0.3s ease;
+	transition: var(--shawsedu-transition);
 	z-index: 999;
 }
 
 .back-to-top:hover {
-	background: #555;
+	background: var(--shawsedu-accent-dark);
 	transform: translateY(-3px);
 }
 
@@ -83,4 +111,3 @@
 		right: 20px;
 	}
 }
-
