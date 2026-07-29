@@ -55,6 +55,8 @@ class Shaw_Service_Process_Loop_Widget extends Shaw_Service_Loop_Widget_Base
                 'options' => [
                     '3' => '3',
                     '4' => '4',
+                    '5' => '5',
+                    '6' => '6',
                 ],
             ]
         );

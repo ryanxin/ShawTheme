@@ -58,6 +58,8 @@ class Shaw_Education_Services
         add_action('elementor/widgets/register', [$this, 'register_elementor_widgets']);
         add_action('elementor/frontend/after_enqueue_styles', [$this, 'enqueue_widget_assets']);
         add_action('elementor/editor/after_enqueue_styles', [$this, 'enqueue_widget_assets']);
+        add_action('elementor/frontend/after_enqueue_scripts', [$this, 'enqueue_widget_scripts']);
+        add_action('elementor/editor/after_enqueue_scripts', [$this, 'enqueue_widget_scripts']);
     }
 
     private function include_widget_files()
@@ -67,6 +69,7 @@ class Shaw_Education_Services
         require_once SHAW_EDU_SERVICES_PATH . 'includes/widgets/service-audience-loop-widget.php';
         require_once SHAW_EDU_SERVICES_PATH . 'includes/widgets/service-process-loop-widget.php';
         require_once SHAW_EDU_SERVICES_PATH . 'includes/widgets/service-compliance-loop-widget.php';
+        require_once SHAW_EDU_SERVICES_PATH . 'includes/widgets/external-page-widget.php';
     }
 
     public function enqueue_widget_assets()
@@ -76,6 +79,17 @@ class Shaw_Education_Services
             SHAW_EDU_SERVICES_URL . 'assets/css/widget-style.css',
             [],
             SHAW_EDU_SERVICES_VERSION
+        );
+    }
+
+    public function enqueue_widget_scripts()
+    {
+        wp_enqueue_script(
+            'shaw-education-services-widget',
+            SHAW_EDU_SERVICES_URL . 'assets/js/widget-script.js',
+            [],
+            SHAW_EDU_SERVICES_VERSION,
+            true
         );
     }
 
@@ -91,6 +105,7 @@ class Shaw_Education_Services
         $widgets_manager->register(new Shaw_Service_Audience_Loop_Widget());
         $widgets_manager->register(new Shaw_Service_Process_Loop_Widget());
         $widgets_manager->register(new Shaw_Service_Compliance_Loop_Widget());
+        $widgets_manager->register(new Shaw_External_Page_Widget());
     }
 
     public function register_post_type()
